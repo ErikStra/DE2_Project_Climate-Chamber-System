@@ -1,4 +1,4 @@
-# BPC/DE2_Project_Climate-Chamber_System
+# BPC/DE2_Project_Climate_Chamber_System
 
 ## Description
  - The goal of the project would be to create a system that measures key environmental parameters (such as temperature, humidity, light levels, soil moisture) for tropical plants.
