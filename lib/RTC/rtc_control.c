@@ -28,6 +28,8 @@ struct RTC_values_structure {
     uint8_t secs;
 } RTC;
 
+char string[3];
+
 volatile uint8_t new_sensor_data = 0;
 uint8_t svetlo = 0;  // Stav světla (0 = vypnuto, 1 = zapnuto)
 
@@ -43,13 +45,10 @@ void compare_time_with_sun(uint8_t current_hours, uint8_t current_minutes);
 void load_settings_from_eeprom();
 void save_settings_to_eeprom();
 
-int rtc_control(void) {
-    char string[3];  // Pro převody čísel
+int rtc_control_init(void) {
+    // Pro převody čísel
 
-    twi_init();
-    uart_init(UART_BAUD_SELECT(115200, F_CPU));
-    sei();
-
+    
     // Načtení časů východu a západu slunce z EEPROM
     load_settings_from_eeprom();
 
@@ -60,13 +59,9 @@ int rtc_control(void) {
         uart_puts("[ERROR] RTC not detected\r\n");
         while (1);
     }
+}
 
-
-    // Nastavení časovače
-    TIM0_ovf_16m();
-    TIM0_ovf_enable();
-
-    while (1) {
+int rtc_control_loop(void) {
         if (new_sensor_data) {
             // Porovnání aktuálního času s časy východu a západu
             compare_time_with_sun(bcdToDec(RTC.hours), bcdToDec(RTC.mins));         
@@ -86,7 +81,6 @@ int rtc_control(void) {
             new_sensor_data = 0;
         }
     }
-}
 
 void rtc_set_time(uint8_t hours, uint8_t mins, uint8_t secs) {
     twi_start();
@@ -186,7 +180,7 @@ uint8_t decToBcd(uint8_t val) {
     return (val / 10 * 16) + (val % 10);
 }
 
-ISR(TIMER0_OVF_vect) {
+void rtc_control_interrupt(void) {
     rtc_read_time();
     new_sensor_data = 1;
 }
