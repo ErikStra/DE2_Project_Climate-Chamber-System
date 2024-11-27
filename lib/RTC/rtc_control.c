@@ -53,21 +53,24 @@ int rtc_control(void) {
     // Načtení časů východu a západu slunce z EEPROM
     load_settings_from_eeprom();
 
+    rtc_initialize();
+
     // Test RTC
     if (twi_test_address(RTC_ADR) != 0) {
         uart_puts("[ERROR] RTC not detected\r\n");
         while (1);
     }
 
+
     // Nastavení časovače
-    TIM1_ovf_1sec();
-    TIM1_ovf_enable();
+    TIM0_ovf_16m();
+    TIM0_ovf_enable();
 
     while (1) {
         if (new_sensor_data) {
             // Porovnání aktuálního času s časy východu a západu
-            compare_time_with_sun(bcdToDec(RTC.hours), bcdToDec(RTC.mins));
-
+            compare_time_with_sun(bcdToDec(RTC.hours), bcdToDec(RTC.mins));         
+            
             // Výpis na UART
             itoa(bcdToDec(RTC.hours), string, 10);
             uart_puts(string);
@@ -82,6 +85,43 @@ int rtc_control(void) {
 
             new_sensor_data = 0;
         }
+    }
+}
+
+void rtc_set_time(uint8_t hours, uint8_t mins, uint8_t secs) {
+    twi_start();
+    twi_write((RTC_ADR << 1) | TWI_WRITE);
+    twi_write(RTC_SEC_MEM);
+    twi_write(decToBcd(secs));
+    twi_write(decToBcd(mins));
+    twi_write(decToBcd(hours));
+    twi_stop();
+}
+
+// Funkce pro inicializaci RTC
+void rtc_initialize(void) {
+    // Čtení sekund z RTC pro kontrolu platnosti času
+    twi_start();
+    twi_write((RTC_ADR << 1) | TWI_WRITE);
+    twi_write(RTC_SEC_MEM);  // Nastavení na registr pro sekundy
+    twi_stop();
+
+    twi_start();
+    twi_write((RTC_ADR << 1) | TWI_READ);
+    uint8_t secs = twi_read(TWI_NACK);  // Čtení sekund
+    twi_stop();
+
+    // Kontrola, zda je čas platný
+    if (secs == 0 || secs == 0xFF || bcdToDec(secs) > 59) {
+        // Nastavení času z kompilace
+        uint8_t hours = atoi(__TIME__);
+        uint8_t mins = atoi(__TIME__ + 3);
+        uint8_t secs = atoi(__TIME__ + 6);
+
+        rtc_set_time(hours, mins, secs);
+        uart_puts("[INFO] RTC initialized with compile time\r\n");
+    } else {
+        uart_puts("[INFO] RTC time is valid\r\n");
     }
 }
 
@@ -146,7 +186,7 @@ uint8_t decToBcd(uint8_t val) {
     return (val / 10 * 16) + (val % 10);
 }
 
-ISR(TIMER1_OVF_vect) {
+ISR(TIMER0_OVF_vect) {
     rtc_read_time();
     new_sensor_data = 1;
 }
