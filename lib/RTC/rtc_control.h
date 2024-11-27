@@ -30,5 +30,7 @@
 
   uint8_t decToBcd(uint8_t val);
 
-
+    void rtc_control_interrupt(void);
+    int rtc_control_loop(void);
+    int rtc_control_init(void);
 #endif
