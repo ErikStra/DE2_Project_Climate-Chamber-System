@@ -7,7 +7,7 @@
 #include <stdio.h>          // Standardní knihovna
 #include "twi.h"            //I2C knihovna Tomáše Fryzy
 #include "UserInterface.h"  // hlavičkový soubor této knihovny
-
+#include "variables.h"      // globální proměnné
 
 
 // -- Konstanty a proměnné ------------------------------------------
@@ -20,36 +20,6 @@
 #define SETTINGS_COUNT 12
 
 
-//Proměnné z čidel
-int8_t TEMP1 = 22;      // Teplota (v °C)
-uint8_t HUM1 = 45;     // Vlhkost vzduchu(v %)
-uint8_t HUM2 = 79;      //vlhkost hlíny
-uint8_t hours = 12;    // hodiny
-uint8_t minutes = 56;  // minuty
-
-uint8_t LED = 0;           //zapnuté LED
-int8_t TEMP2 = 37;        // Teplota LED (v °C)
-uint8_t fan_big =35;     //odvětrávací větrák
-uint8_t fan_small =100;   //cirkulační větrák
-uint8_t fan_led =100;    //větrák pro chlazení LED
-
-uint8_t pump = 0;       //čerpadlo
-uint8_t wlevel = 1;     //hladina 1 - dostatečná, 0 - nízká
-
-
-// Proměnné pro nastavení
-int8_t max_temp = 25;       // Max temp, výchozí 25°C
-int8_t min_temp = 15;       // Min temp, výchozí 15°C
-int8_t max_airhum = 75;     // Max vlhkost vzduchu, výchozí 75%
-int8_t min_airhum = 65;     // Min vlhkost vzduchu, výchozí 65%
-int8_t control = 0;         // Automatické ovládání teploty/vlhkosti, výchozí teplota
-uint8_t schedule = 0;       // Výchozí 12/12 (0 = 12/12, 1 = 16/8, 2 = 24/0)
-uint8_t sunrise = 8;        // Čas východu slunce, výchozí: 8:00
-int8_t max_soilhum = 75;     // Max vlhkost půdy, výchozí 75%
-int8_t min_soilhum = 65;     // Min vlhkost půdy, výchozí 65%
-int8_t water_time = 8;       // Čas zalévání
-int8_t autowater = 1;        // Automatické zalévání (ve stanovený čas, stálé, vypnuto)
-int8_t chartest = 0;        // temp proměnná pro testování znaků zobrazitelných na displeji
 
 // Pole pro zobrazení časových plánů
 const char *schedule_options[3] = {"12/12", "16/08", "24/00"};
@@ -346,17 +316,12 @@ void HandleInput(char input) {
 }
 
 // -- Hlavní smyčka -------------------------------------------------
-int UserInterface(void) {
+int UserInterface_init(void) {
     // Inicializace LCD a UART
     HD44780_PCF8574_Init(addr);
     HD44780_PCF8574_DisplayClear(addr);
     HD44780_PCF8574_DisplayOn(addr);
-    uart_init(UART_BAUD_SELECT(9600, F_CPU));
-
-    // Inicializace timerů
-    TIM1_ovf_262ms();
-    TIM1_ovf_enable();
-    sei();
+    
     
     char uart_msg[10];
     uart_puts("Scanning I2C... ");
@@ -369,10 +334,12 @@ int UserInterface(void) {
         }
     }
     uart_puts("\r\nDone");
-
-
+    return 0;
+    }
+    
     // Hlavní smyčka
-    while (1) {
+int UserInterface_loop (void)
+    {
         // Zpracování vstupu
         uint16_t value = uart_getc();
         if ((value & 0xff00) == 0) {
@@ -403,9 +370,9 @@ int UserInterface(void) {
             }
             flag_update_lcd = 0;
         }
+        return 0;
     }
-    return 0;
-}
+    
 
 // -- ISR Timer -----------------------------------------------------
 ISR(TIMER1_OVF_vect) {

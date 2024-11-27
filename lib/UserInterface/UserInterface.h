@@ -23,7 +23,8 @@
    *
    * @return void
    */
-  int UserInterface (void);
+  int UserInterface_init (void);
+  int UserInterface_loop (void);
   void LCD_DrawScreen1(void);
   void LCD_DrawScreen2(void);
   void LCD_DrawScreen3(void);

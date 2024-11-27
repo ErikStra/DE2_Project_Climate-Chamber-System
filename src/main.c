@@ -22,9 +22,21 @@
  */
 int main(void)
 {
-  // voltmeter
-  UserInterface();
+  // inits
+  // Inicializace timerů
+    TIM1_ovf_262ms();
+    TIM1_ovf_enable();
+    uart_init(UART_BAUD_SELECT(9600, F_CPU));
+    //uart_init(UART_BAUD_SELECT(115200, F_CPU));
+    sei();
+  
+    UserInterface_init();
 
+  while (1)
+  {
+  UserInterface_loop();
+  
+  }
   // EXIT
   // ------------------------------------------------- 
   // return & exit
