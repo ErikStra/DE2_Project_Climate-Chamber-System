@@ -1,6 +1,5 @@
 #include <avr/io.h>         // AVR device-specific IO definitions
 #include <avr/interrupt.h>  // Interrupts standard C library for AVR-GCC
-#include "../../include/timer.h"        // Timer library for AVR-GCC
 #include <uart.h>           // Peter Fleury's UART library
 #include <stdlib.h>         // C library. Needed for number conversions
 #include "hd44780pcf8574.h" // LCD i2C library
