@@ -25,7 +25,7 @@ extern int8_t min_temp;
 extern int8_t max_airhum;     
 extern int8_t min_airhum;     
 extern int8_t control;         
-extern uint8_t schedule;       
+extern uint8_t sunset;       
 extern uint8_t sunrise;        
 extern int8_t max_soilhum;     
 extern int8_t min_soilhum;     

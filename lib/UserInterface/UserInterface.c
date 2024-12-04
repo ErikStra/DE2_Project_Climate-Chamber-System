@@ -21,7 +21,6 @@
 
 
 // Pole pro zobrazení časových plánů
-const char *schedule_options[3] = {"12/12", "16/08", "24/00"};
 const char *control_options[8] = {"Temp.  ", "AirHum.", "None   "};
 const char *autowater_options[5] = {"Cont.  ", "Once ", "Off  "};
 const char *ONOFF_options[3] = {"ON", "off"};
@@ -74,13 +73,13 @@ void LCD_DrawScreen2() {
             snprintf(buffer, 13, "Control     ");
             snprintf(buffer2, 11, "%s", control_options[control]);
             break;    
-        case 6: // Schedule
-            snprintf(buffer, 13, "Schedule");
-            snprintf(buffer2, 6, "%s    ", schedule_options[schedule]);
-            break;
-        case 7: //Light ON time (HOUR)
+        case 6: // Light ON time (Hour)
             snprintf(buffer, 13, "Sunrise ");
             snprintf(buffer2, 7, "%d:00  ", sunrise);
+            break;
+        case 7: //Light OFF time (HOUR)
+            snprintf(buffer, 13, "Sunset ");
+            snprintf(buffer2, 7, "%d:00  ", sunset);
             break;
         case 8: // Max SoilHum
             snprintf(buffer, 13, "Max Soil Hum");
@@ -229,12 +228,12 @@ void HandleInput(char input) {
                 case 5: // Control
                     if (control > 0) {
                         control--; } break;
-                case 6: // Schedule
-                    if (schedule > 0) {
-                        schedule--; } break;
-                case 7: // Sunrise
+                case 6: // Sunrise
                     if (sunrise > 0) {
                         sunrise--; } break;
+                case 7: // Sunset
+                    if (sunset > 0) {
+                        sunset--; } break;
                 case 8: // Max soilhum
                     if (max_soilhum > min_soilhum) {
                         max_soilhum--; } break;
@@ -276,12 +275,12 @@ void HandleInput(char input) {
                 case 5: // Control
                     if (control < 2) {
                         control++; } break;
-                case 6: // Schedule
-                    if (schedule < 2) {
-                        schedule++; } break;
-                case 7: // Sunrise
+                case 6: // Sunrise
                     if (sunrise < 23) {
                         sunrise++; } break;
+                case 7: // Sunrise
+                    if (sunset < 23) {
+                        sunset++; } break;
                 case 8: // Max soilhum
                     if (max_soilhum < 100) {
                         max_soilhum++;
@@ -373,10 +372,7 @@ int UserInterface_loop (void)
     
 void UserInterface_interrupt (uint8_t n_ovfs)
 {
-    if (n_ovfs % 10 == 0)
-    {
-        flag_update_lcd = 1;
-    }
+    flag_update_lcd = 1;
     if (n_ovfs % 50 == 0)
     {
         flag_tick = 1;

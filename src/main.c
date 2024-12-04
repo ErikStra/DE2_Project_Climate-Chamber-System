@@ -18,8 +18,8 @@
 #include <stdlib.h>         // C library. Needed for number conversions
 #include <stdio.h>          // Standardní knihovna
 #include "variables.h"      // globální proměnné
-#include "rtc_control.h"    // čízení reálného času
 
+#include "rtc_control.h"    // čízení reálného času
 #include "UserInterface.h"
 #include "fan_senzor.h"
 
@@ -36,7 +36,7 @@ int main(void)
 {
   // inits
   // Inicializace timerů
-        TIM0_ovf_16ms();
+        TIM0_ovf_16m();
         TIM0_ovf_enable();
     uart_init(UART_BAUD_SELECT(9600, F_CPU));
     //uart_init(UART_BAUD_SELECT(115200, F_CPU));
@@ -44,18 +44,18 @@ int main(void)
 
     
     UserInterface_init();
-    rtc_control_init();
-    FanSenzor_init();
+    //rtc_control_init();
+    //FanSenzor_init();
     
 
   while (1)
   {
   UserInterface_loop();
-  rtc_control_loop();
+  //rtc_control_loop();
 
   if(flag_fansensor==1)
   {
-    FanSenzor_loop();
+    //FanSenzor_loop();
     flag_fansensor=0;
   }
   
@@ -73,13 +73,12 @@ ISR(TIMER0_OVF_vect)
 
     if (n_ovfs % 10 == 0)
     {
-      
+      UserInterface_interrupt(n_ovfs);
     }
 
     if (n_ovfs % 100 == 0)
     {
-      UserInterface_interrupt(n_ovfs);
-      rtc_control_interrupt();
+      //rtc_control_interrupt();
       flag_fansensor=1;
       
     }
