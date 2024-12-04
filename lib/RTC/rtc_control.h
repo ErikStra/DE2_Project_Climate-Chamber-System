@@ -14,7 +14,7 @@
 
   int rtc_control (void);
 
-  void compare_time_with_sun(uint8_t current_hours, uint8_t current_minutes);
+  int compare_time_with_sun(int currentHour, int sunrise, int sunset);
 
   void rtc_set_time(uint8_t hours, uint8_t minutes, uint8_t seconds);
 
@@ -31,6 +31,6 @@
   uint8_t decToBcd(uint8_t val);
 
     void rtc_control_interrupt(void);
-    int rtc_control_loop(void);
-    int rtc_control_init(void);
+    void rtc_control_loop(void);
+    void rtc_control_init(void);
 #endif

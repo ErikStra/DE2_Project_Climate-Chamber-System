@@ -23,7 +23,7 @@
 // Pole pro zobrazení časových plánů
 const char *control_options[8] = {"Temp.  ", "AirHum.", "None   "};
 const char *autowater_options[5] = {"Cont.  ", "Once ", "Off  "};
-const char *ONOFF_options[3] = {"ON", "off"};
+const char *ONOFF_options[3] = {"off", "ON"};
 const char *HILO_options[2] = {"HI", "lo"};
 
 // Další proměnné

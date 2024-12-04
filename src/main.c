@@ -44,14 +44,14 @@ int main(void)
 
     
     UserInterface_init();
-    //rtc_control_init();
+    rtc_control_init();
     //FanSenzor_init();
     
 
   while (1)
   {
   UserInterface_loop();
-  //rtc_control_loop();
+  rtc_control_loop();
 
   if(flag_fansensor==1)
   {
@@ -71,20 +71,20 @@ ISR(TIMER0_OVF_vect)
     
     
 
-    if (n_ovfs % 10 == 0)
+    if (n_ovfs % 20 == 0)
     {
       UserInterface_interrupt(n_ovfs);
     }
 
-    if (n_ovfs % 100 == 0)
+    if (n_ovfs == 51)
     {
-      //rtc_control_interrupt();
+      rtc_control_interrupt();
       flag_fansensor=1;
       
     }
     
     n_ovfs++;
-    if (n_ovfs >= 200)
+    if (n_ovfs >= 100)
     {
         n_ovfs = 0;
     }

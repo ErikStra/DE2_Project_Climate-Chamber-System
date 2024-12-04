@@ -23,11 +23,9 @@
 #define EEPROM_LIGHT_STATE_ADDR 0x04
 
 /* Struktura RTC */
-struct RTC_values_structure {
-    uint8_t hours;
-    uint8_t minutes;
-    uint8_t secs;
-} RTC;
+
+uint8_t secs = 0;
+
 
 char string[3];
 
@@ -42,11 +40,11 @@ uint8_t sunset_hours, sunset_minutes;
 uint8_t bcdToDec(uint8_t val);
 uint8_t decToBcd(uint8_t val);
 void rtc_read_time();
-void compare_time_with_sun(uint8_t current_hours, uint8_t current_minutes);
+int compare_time_with_sun(int currentHour, int sunrise, int sunset);
 void load_settings_from_eeprom();
 void save_settings_to_eeprom();
 
-int rtc_control_init(void) {
+void rtc_control_init(void) {
     
     // Načtení časů východu a západu slunce z EEPROM
     load_settings_from_eeprom();
@@ -60,23 +58,29 @@ int rtc_control_init(void) {
     }
 }
 
-int rtc_control_loop(void) {
+void rtc_control_loop(void) {
         if (new_sensor_data) {
             // Porovnání aktuálního času s časy východu a západu
-            compare_time_with_sun(bcdToDec(RTC.hours), bcdToDec(RTC.minutes));         
+            compare_time_with_sun(hours, sunrise, sunset);         
             
             // Výpis na UART
-            itoa(bcdToDec(RTC.hours), string, 10);
+            itoa(bcdToDec(hours), string, 10);
             uart_puts(string);
             uart_puts(":");
-            itoa(bcdToDec(RTC.minutes), string, 10);
+            itoa(bcdToDec(minutes), string, 10);
             uart_puts(string);
             uart_puts(":");
-            itoa(bcdToDec(RTC.secs), string, 10);
+            itoa(bcdToDec(secs), string, 10);
             uart_puts(string);
             uart_puts(" ");
             uart_puts(LED ? "ON\r\n" : "OFF\r\n");
-
+            itoa(sunrise, string, 10);
+            uart_puts(string);
+            uart_puts("         ");
+            itoa(sunset, string, 10);
+            uart_puts(string);
+            uart_puts("\n");
+            
             new_sensor_data = 0;
         }
     }
@@ -118,19 +122,17 @@ void rtc_initialize(void) {
     }
 }
 
-void compare_time_with_sun(uint8_t current_hours, uint8_t current_minutes) {
-    // Svítí, pokud je aktuální čas mezi východem a západem slunce
-    if ((current_hours > sunrise_hours || 
-         (current_hours == sunrise_hours && current_minutes >= sunrise_minutes)) &&
-        (current_hours < sunset_hours || 
-         (current_hours == sunset_hours && current_minutes < sunset_minutes))) {
-        LED = 1;
+int compare_time_with_sun(int currentHour, int sunrise, int sunset) {
+    // Pokud je západ slunce menší než východ slunce (přechod přes půlnoc)
+    if (sunset < sunrise) {
+        // Den je mezi sunrise a půlnocí nebo od půlnoci do sunset
+        LED = (currentHour >= sunrise || currentHour < sunset);
     } else {
-        LED = 0;
+        // Den je mezi sunrise a sunset
+        LED = (currentHour >= sunrise && currentHour < sunset);
     }
-
-    // Uložení stavu světla do EEPROM
-    eeprom_write_byte((uint8_t*)EEPROM_LIGHT_STATE_ADDR, variables.LED);
+      // Uložení stavu světla do EEPROM
+    eeprom_write_byte((uint8_t*)EEPROM_LIGHT_STATE_ADDR, LED);
 }
 
 void rtc_read_time() {
@@ -141,9 +143,9 @@ void rtc_read_time() {
 
     twi_start();
     twi_write((RTC_ADR << 1) | TWI_READ);
-    RTC.secs = twi_read(TWI_ACK);
-    RTC.mins = twi_read(TWI_ACK);
-    RTC.hours = twi_read(TWI_NACK);
+    secs = twi_read(TWI_ACK);
+    minutes = twi_read(TWI_ACK);
+    hours = twi_read(TWI_NACK);
     twi_stop();
 }
 
