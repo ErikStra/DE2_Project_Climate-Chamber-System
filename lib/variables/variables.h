@@ -4,14 +4,14 @@
 #include <stdint.h>
 
 // Proměnné z čidel
-extern int8_t TEMP1;      
+extern int16_t TEMP1;      
 extern uint8_t HUM1;     
 extern uint8_t HUM2;      
 extern uint8_t hours;    
 extern uint8_t minutes;  
 
 extern uint8_t LED;           
-extern int8_t TEMP2;        
+extern int16_t TEMP2;        
 extern uint8_t fan_big;     
 extern uint8_t fan_small;   
 extern uint8_t fan_led;     

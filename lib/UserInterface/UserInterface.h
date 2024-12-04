@@ -31,5 +31,6 @@
   void LCD_DrawScreen4(void);
   void LCD_DrawScreen5(void);
   void HandleInput(char input);
+  void UserInterface_interrupt (uint8_t n_ovfs);
 
 #endif

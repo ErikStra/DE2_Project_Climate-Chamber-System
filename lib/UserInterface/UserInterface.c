@@ -37,7 +37,7 @@ uint8_t selected_setting = 0;
 //Flagy pro interrupty
 volatile uint8_t flag_update_lcd = 0;
 volatile uint8_t flag_tick = 0;
-static uint8_t n_ovfs = 0;
+
 
 // -- Funkce pro vykreslování ---------------------------------------
 void LCD_DrawScreen2() {
@@ -343,7 +343,6 @@ int UserInterface_loop (void)
         // Zpracování vstupu
         uint16_t value = uart_getc();
         if ((value & 0xff00) == 0) {
-            n_ovfs = 0;
             uart_putc(value); // Výpis přijatého znaku do konzole
             HandleInput((char)value);
         }
@@ -373,21 +372,21 @@ int UserInterface_loop (void)
         return 0;
     }
     
-
-// -- ISR Timer -----------------------------------------------------
-ISR(TIMER1_OVF_vect) {
-    flag_update_lcd = 1;
-
-    n_ovfs++;
-    if (n_ovfs % 2 == 0)
+void UserInterface_interrupt (uint8_t n_ovfs)
+{
+    if (n_ovfs % 10 == 0)
+    {
+        flag_update_lcd = 1;
+    }
+    if (n_ovfs % 50 == 0)
     {
         flag_tick = 1;
     }
-    if (n_ovfs % 4 == 0)
+    if (n_ovfs % 100 == 0)
     {
         flag_tick = 0;
     }
-    if (n_ovfs == 30)
+    if (n_ovfs == 180)
     {
         if (current_screen < 3)
         {
@@ -397,7 +396,5 @@ ISR(TIMER1_OVF_vect) {
         {
             current_screen = 0;
         }
-        n_ovfs = 0;
     }
-    
 }

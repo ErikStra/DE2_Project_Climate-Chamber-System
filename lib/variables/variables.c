@@ -1,14 +1,15 @@
 #include "variables.h"
 
+
 // Proměnné z čidel
-int8_t TEMP1 = 22;      
+int16_t TEMP1 = 2233;      
 uint8_t HUM1 = 45;     
 uint8_t HUM2 = 79;      
 uint8_t hours = 12;    
 uint8_t minutes = 56;  
 
 uint8_t LED = 0;           
-int8_t TEMP2 = 37;        
+int16_t TEMP2 = 3721;        
 uint8_t fan_big = 35;     
 uint8_t fan_small = 100;   
 uint8_t fan_led = 100;     
