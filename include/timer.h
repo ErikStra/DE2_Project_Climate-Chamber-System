@@ -1,6 +1,6 @@
 #ifndef TIMER_H
 # define TIMER_H
-
+//VV//
 /***********************************************************
  * 
  * Timer library for AVR-GCC.
@@ -35,36 +35,6 @@
 
 
 /* Defines ------------------------------------------------*/
-
-/**
- * @name  Definitions for 8-bit Timer/Counter0
- * @note  t_OVF = 1/F_CPU * prescaler * 2^n where n = 8, F_CPU = 16 MHz
- */
-/** @brief Stop timer, prescaler 000 --> STOP */
-#define TIM0_stop() TCCR0B &= ~((1<<CS02) | (1<<CS01) | (1<<CS00));
-
-/** @brief Set overflow 16us, prescaler 001 --> 1 */
-#define TIM0_ovf_16us() TCCR0B &= ~((1<<CS02) | (1<<CS01)); TCCR0B |= (1<<CS00);
-
-/** @brief Set overflow 128us, prescaler 010 --> 8 */
-#define TIM0_ovf_128us() TCCR0B &= ~((1<<CS02) | (1<<CS00)); TCCR0B |= (1<<CS01);
-
-/** @brief Set overflow 1024us, prescaler 011 --> 64 */
-#define TIM0_ovf_1024us() TCCR0B &= ~(1<<CS02); TCCR0B |= (1<<CS01) | (1<<CS00);
-
-/** @brief Set overflow 4.096ms, prescaler 100 --> 256 */
-#define TIM0_ovf_4ms() TCCR0B &= ~((1<<CS01) | (1<<CS00)); TCCR0B |= (1<<CS02);
-
-/** @brief Set overflow 16.384ms, prescaler // 101 --> 1024 */
-#define TIM0_ovf_16ms() TCCR0B &= ~(1<<CS01); TCCR0B |= (1<<CS02) | (1<<CS00);
-
-/** @brief Enable overflow interrupt, 1 --> enable */
-#define TIM0_ovf_enable() TIMSK0 |= (1<<TOIE0);
-
-/** @brief Disable overflow interrupt, 0 --> disable */
-#define TIM0_ovf_disable() TIMSK0 &= ~(1<<TOIE0);
-
-
 /**
  * @name  Definitions for 16-bit Timer/Counter1
  * @note  t_OVF = 1/F_CPU * prescaler * 2^n where n = 16, F_CPU = 16 MHz
@@ -93,36 +63,56 @@
 /** @brief Disable overflow interrupt, 0 --> disable */
 #define TIM1_ovf_disable() TIMSK1 &= ~(1<<TOIE1);
 
+/** casovac 0**/
+
+
+#define TIM0_stop() TCCR0B &= ~((1<<CS02) | (1<<CS01) | (1<<CS00));
+
+/** @brief Set overflow 4ms, prescaler 001 --> 1 */
+#define TIM0_ovf_16u () TCCR0B &= ~((1<<CS02) | (1<<CS01)); TCCR0B |= (1<<CS00);
+
+/** @brief Set overflow 33ms, prescaler 010 --> 8 */
+#define TIM0_ovf_128u() TCCR0B &= ~((1<<CS02) | (1<<CS00)); TCCR0B |= (1<<CS01);
+
+/** @brief Set overflow 262ms, prescaler 011 --> 64 */
+#define TIM0_ovf_1024u() TCCR0B &= ~(1<<CS02); TCCR0B |= (1<<CS01) | (1<<CS00);
+
+/** @brief Set overflow 1s, prescaler 100 --> 256 */
+#define TIM0_ovf_4m() TCCR0B &= ~((1<<CS01) | (1<<CS00)); TCCR0B |= (1<<CS02);
+
+/** @brief Set overflow 4s, prescaler // 101 --> 1024 */
+#define TIM0_ovf_16m() TCCR0B &= ~(1<<CS01); TCCR0B |= (1<<CS02) | (1<<CS00);
+
+/** @brief Enable overflow interrupt, 1 --> enable */
+#define TIM0_ovf_enable() TIMSK0 |= (1<<TOIE0);
+
+/** @brief Disable overflow interrupt, 0 --> disable */
+#define TIM0_ovf_disable() TIMSK0 &= ~(1<<TOIE0);
+
+
+
+/**
+ * @name  Definitions for 8-bit Timer/Counter0
+ * @note  t_OVF = 1/F_CPU * prescaler * 2^n where n = 8, F_CPU = 16 MHz
+ */
+// WRITE YOUR CODE HERE
+
 
 /**
  * @name  Definitions for 8-bit Timer/Counter2
  * @note  t_OVF = 1/F_CPU * prescaler * 2^n where n = 8, F_CPU = 16 MHz
  */
-/** @brief Stop timer, prescaler 000 --> STOP */
-#define TIM2_stop() TCCR2B &= ~((1<<CS22) | (1<<CS21) | (1<<CS20));
+// WRITE YOUR CODE HERE
+#define TIM2_OVF_16MS() TCCR2B |= (1<<CS22) | (1<<CS21) | (1<<CS20);
 
-/** @brief Set overflow 16us, prescaler 001 --> 1 */
-#define TIM2_ovf_16us() TCCR2B &= ~((1<<CS22) | (1<<CS21)); TCCR2B |= (1<<CS20);
+#define TIM2_OVF_ENABLE() TIMSK2 |= (1<<TOIE2);
 
-/** @brief Set overflow 128us, prescaler 010 --> 8 */
-#define TIM2_ovf_128us() TCCR2B &= ~((1<<CS22) | (1<<CS20)); TCCR2B |= (1<<CS21);
+#define TIM2_OVF_DISABLE() TIMSK2 &= ~(1<<TOIE2);
 
-/** @brief Set overflow 1024us, prescaler 011 --> 64 */
-#define TIM2_ovf_1024us() TCCR2B &= ~(1<<CS22); TCCR2B |= (1<<CS21) | (1<<CS20);
 
-/** @brief Set overflow 4.096ms, prescaler 100 --> 256 */
-#define TIM2_ovf_4ms() TCCR2B &= ~((1<<CS21) | (1<<CS20)); TCCR2B |= (1<<CS22);
+#define TIM3_ovf_25ms() T
 
-/** @brief Set overflow 16.384ms, prescaler // 101 --> 1024 */
-#define TIM2_ovf_16ms() TCCR2B &= ~(1<<CS21); TCCR2B |= (1<<CS22) | (1<<CS20);
 
-/** @brief Enable overflow interrupt, 1 --> enable */
-#define TIM2_ovf_enable() TIMSK2 |= (1<<TOIE2);
-
-/** @brief Disable overflow interrupt, 0 --> disable */
-#define TIM2_ovf_disable() TIMSK2 &= ~(1<<TOIE2);
 /** @} */
-
-// NEZAPOMEN DOPLNIT JESTE 2 RADKY PRO 32 BIT A 128 BIT PRO COUNTER 2
 
 #endif

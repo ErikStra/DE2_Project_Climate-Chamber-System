@@ -1,0 +1,70 @@
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <util/delay.h>
+#include <uart.h>
+#include <stdlib.h>
+#include "dht.h"       // Include DHT library
+#include "pwm.h"       // Include PWM library
+#include "variables.h" // Include variables file
+
+// Function to control fans based on temperature
+void fan_control(void) {
+    int8_t temp_diff = TEMP2 - max_temp; // Difference between current temperature and maximum allowed temperature
+
+    if (temp_diff >= 5) {
+        // All fans run at 100%
+        pwm_set_duty_cycle(fan_small);  // Small fan
+        pwm_set_duty_cycle(fan_led);    // LED fan
+        pwm_set_duty_cycle(fan_big);    // Big fan
+        uart_puts("All fans at 100%\r\n");
+    } else if (temp_diff >= 2) {
+        // Small and LED fans at 100%, big fan off
+        pwm_set_duty_cycle(fan_small);  // Small fan
+        pwm_set_duty_cycle(fan_led);    // LED fan
+        pwm_set_duty_cycle(fan_big);      // Big fan
+        uart_puts("Small and LED fans at 100%, Big fan off\r\n");
+    } else if (temp_diff >= 1) {
+        // Only small fan at 100%
+        pwm_set_duty_cycle(fan_small);  // Small fan
+        pwm_set_duty_cycle(fan_led);      // LED fan
+        pwm_set_duty_cycle(fan_big);      // Big fan
+        uart_puts("Small fan at 100%, Other fans off\r\n");
+    } else {
+        // All fans are off
+        pwm_set_duty_cycle(fan_small);
+        pwm_set_duty_cycle(fan_led);
+        pwm_set_duty_cycle(fan_big);
+        uart_puts("All fans are off\r\n");
+    }
+}
+
+// Function to initialize the fan system
+int FanSenzor_init(void) {
+    pwm_init(); // Initialize PWM
+    return 0;
+}
+
+// Main loop for the fan system
+int FanSenzor_loop(void) {
+    char buffer[10];
+    uint8_t dht_data[5];  // Array to store data from DHT sensor
+
+    // Read data from the DHT sensor
+    if (dht_read_data(dht_data) == 0) {  // Check if reading was successful
+        TEMP2 = dht_data[2];  // Update TEMP2 with the current temperature from the sensor
+         
+        // Send temperature data via UART
+        uart_puts("Current temperature: ");
+        itoa(TEMP2, buffer, 10);
+        uart_puts(buffer);
+        uart_puts(" °C\r\n");
+
+        // Control fans based on the current temperature
+        fan_control();
+    } else {
+        uart_puts("DHT sensor read error!\r\n");
+    }
+
+    _delay_ms(2000);  // Delay between readings
+    return 0;
+}
