@@ -24,8 +24,6 @@
 #include "UserInterface.h"  // UI a ovládání
 #include "fan_PID.h"        // Ovládání ventilátorů
 #include "outputControl.h"  // Ovládání GPIO pinů
-#include "build_time.h"
-
 
 /**
  * @desc   Main function
@@ -40,6 +38,7 @@ volatile uint8_t flag_UI_display_loop = 0;
 volatile uint8_t flag_fan_PID = 0;
 volatile uint8_t flag_RTC = 0;
 volatile uint8_t flag_outputControl = 0;
+volatile uint8_t flag_dht_update_temp1 = 0;
 
 uint16_t n_ovfs = 0;
 
@@ -95,6 +94,12 @@ int main(void)
       flag_RTC = 0;
     }
 
+    if(flag_dht_update_temp1)
+    {
+      dht_update_temp1();
+      flag_RTC = 0;
+    }
+
 
   
   
@@ -125,6 +130,7 @@ ISR(TIMER0_OVF_vect)
     {
       //flag_fan_PID=1;
       flag_outputControl = 1;
+      flag_dht_update_temp1 = 1;
 
     }
     

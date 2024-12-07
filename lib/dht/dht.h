@@ -12,5 +12,6 @@ void dht_request(void);
 uint8_t dht_response(void);
 uint8_t dht_read_byte(void);
 void dht_read_data(uint8_t *data);
+void dht_update_temp1(void);
 
 #endif  // DHT_H
