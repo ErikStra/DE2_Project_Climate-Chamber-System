@@ -1,1 +1,0 @@
-#define DUMMY_TIMESTAMP __TIME__

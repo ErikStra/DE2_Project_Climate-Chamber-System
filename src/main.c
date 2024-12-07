@@ -24,6 +24,8 @@
 #include "UserInterface.h"  // UI a ovládání
 #include "fan_PID.h"        // Ovládání ventilátorů
 #include "outputControl.h"  // Ovládání GPIO pinů
+#include "build_time.h"
+
 
 /**
  * @desc   Main function
@@ -40,6 +42,8 @@ volatile uint8_t flag_RTC = 0;
 volatile uint8_t flag_outputControl = 0;
 
 uint16_t n_ovfs = 0;
+
+
 
 int main(void)
 {

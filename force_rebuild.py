@@ -1,6 +1,7 @@
+import os
 import time
 
 def before_build(env, platform):
-    with open("src/dummy.h", "w") as f:
-        f.write(f"#define DUMMY_TIMESTAMP \"{time.ctime()}\"\n")
-
+    timestamp = str(time.time())
+    with open("src/build_time.h", "w") as f:
+        f.write(f"#define BUILD_TIMESTAMP \"{timestamp}\"\n")
