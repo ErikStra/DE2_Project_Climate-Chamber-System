@@ -1,5 +1,7 @@
 #include "dht.h"
 #include "variables.h"
+#include <uart.h>
+#include <stdio.h>
 
 void dht_request(void) {
     DDRD |= (1 << DHT_PIN);  // Set DHT_PIN as output
@@ -54,7 +56,10 @@ void dht_update_temp1(void)
     uint8_t temp_dec = dht_data[3];  // Decimal part of temperature
     // Send temperature data via UART
     uart_puts("Raw Temperature: ");
-    itoa(dht_data, buffer, 10);
+    itoa(temp_int, buffer, 10);
     uart_puts(buffer);
+    
+   
+    uart_putc('.');
     uart_puts(" °C\r\n");
 }

@@ -134,9 +134,15 @@ ISR(TIMER0_OVF_vect)
       flag_dht_update_temp1 = 1;
 
     }
+
+    if (n_ovfs % 4*63 == 0) //cca každou 1s
+    {
+      flag_dht_update_temp1 = 1;
+
+    }
     
     n_ovfs++;
-    if (n_ovfs >= 100)
+    if (n_ovfs >= 500)
     {
         n_ovfs = 0;
     }

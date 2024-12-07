@@ -85,9 +85,9 @@ void rtc_set_time(uint8_t hours, uint8_t minutes, uint8_t secs) {
     twi_start();
     twi_write((RTC_ADR << 1) | TWI_WRITE);
     twi_write(RTC_SEC_MEM);
-    twi_write((secs));
-    twi_write((minutes));
-    twi_write((hours));
+    twi_write(secs);
+    twi_write(minutes);
+    twi_write(hours);
     twi_stop();
 }
 
@@ -101,7 +101,7 @@ void rtc_set_time(uint8_t hours, uint8_t minutes, uint8_t secs) {
 
     twi_start();
     twi_write((RTC_ADR << 1) | TWI_READ);
-    uint8_t secs = twi_read(TWI_NACK);  // Čtení sekund
+    uint8_t minutes = twi_read(TWI_NACK);  // Čtení sekund
     twi_stop(); 
 
   if (1)//secs == 0 || secs == 0xFF || bcdToDec(secs) > 59)
