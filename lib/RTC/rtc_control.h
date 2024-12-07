@@ -14,7 +14,7 @@
 
   int rtc_control (void);
 
-  int compare_time_with_sun(int currentHour, int sunrise, int sunset);
+  uint8_t compare_time_with_sun(uint8_t currentHour, uint8_t sunrise, uint8_t sunset);
 
   void rtc_set_time(uint8_t hours, uint8_t minutes, uint8_t seconds);
 

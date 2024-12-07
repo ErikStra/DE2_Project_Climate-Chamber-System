@@ -2,10 +2,10 @@
 #include <avr/interrupt.h> 
 #include <stdio.h> 
 #include <string.h> // For memset 
-#include "timer.h" 
-#include "uart.h" 
-#include "pwm.h" 
-#include "variables.h" 
+#include "../../include/timer.h" 
+#include <uart.h> 
+#include <pwm.h> 
+#include <variables.h> 
  
 #define F_CPU 16000000L 
  
