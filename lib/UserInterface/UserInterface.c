@@ -55,11 +55,11 @@ void LCD_DrawScreen2() {
             break;
         case 1: // Max Temp
             snprintf(buffer, 13, "Max Temp.");
-            snprintf(buffer2, 6, "%d%cC ", max_temp, 223);
+            snprintf(buffer2, 6, "%d%cC ", max_temp1, 223);
             break;
         case 2: // Min Temp
-            snprintf(buffer, 13, "Min Temp.");
-            snprintf(buffer2, 6, "%d%cC ", min_temp, 223);
+            snprintf(buffer, 13, "Max LED temp.");
+            snprintf(buffer2, 6, "%d%cC ", max_temp2, 223);
             break;
         case 3: // Max AirHum
             snprintf(buffer, 13, "Max Air Hum.");
@@ -127,11 +127,11 @@ void LCD_DrawScreen1() {
     HD44780_PCF8574_PositionXY(addr, 11, 1);
     if (flag_tick == 1)
     {
-        snprintf(buffer, 16, "%02d:%02d", hours, minutes);
+        snprintf(buffer, 16, "%2d:%2d", hours, minutes);
     }
     else
     {
-        snprintf(buffer, 16, "%02d %02d", hours, minutes);
+        snprintf(buffer, 16, "%2d %2d", hours, minutes);
     }
     HD44780_PCF8574_DrawString(addr, buffer);
 }
@@ -208,14 +208,12 @@ void HandleInput(char input) {
                 case 0:
                     break;
                 case 1: // Max Temp
-                    if (max_temp > min_temp) {
-                        max_temp--; } break;
-                case 2: // Min Temp
-                    if (min_temp > 0) {
-                        min_temp--;
+                    if (max_temp1 > 0) {
+                        max_temp1--; } break;
+                case 2: // Max LED temp
+                    if (max_temp2 > 0) {
+                        max_temp2--;
                     }
-                    if (min_temp > max_temp) { // Zajištění platného intervalu
-                        min_temp = max_temp; } break;
                 case 3: // Max airhum
                     if (max_airhum > min_airhum) {
                         max_airhum--; } break;
@@ -255,14 +253,12 @@ void HandleInput(char input) {
                 case 0:
                     break;
                 case 1: // Max Temp
-                    if (max_temp < 50) {
-                        max_temp++;
+                    if (max_temp1 < 50) {
+                        max_temp1++;
                     }
-                    if (max_temp < min_temp) { // Zajištění platného intervalu
-                        max_temp = min_temp; } break;
                 case 2: // Min Temp
-                    if (min_temp < max_temp) {
-                        min_temp++; } break;
+                    if (max_temp2 < 50) {
+                        max_temp2++; } break;
                 case 3: // Max airhum
                     if (max_airhum < 100) {
                         max_airhum++;
@@ -336,7 +332,7 @@ int UserInterface_init(void) {
     }
     
     // Hlavní smyčka
-int UserInterface_loop (void)
+void UserInterface_input_loop (void)
     {
         // Zpracování vstupu
         uint16_t value = uart_getc();
@@ -344,9 +340,32 @@ int UserInterface_loop (void)
             uart_putc(value); // Výpis přijatého znaku do konzole
             HandleInput((char)value);
         }
+    }
+
+void UserInterface_display_loop (uint16_t n_ovfs){
+
+            if (n_ovfs % 50 == 0)
+            {
+                flag_tick = 1;
+            }
+            if (n_ovfs % 100 == 0)
+            {
+                flag_tick = 0;
+            }
+            if (n_ovfs == 180)
+            {
+                if (current_screen < 3)
+                {
+                    current_screen++;
+                }
+                else if (current_screen == 3)
+                {
+                    current_screen = 0;
+                }
+            }
+        
 
         // Aktualizace displeje
-        if (flag_update_lcd) {
             // Smazání displeje při změně obrazovky
             if (current_screen != last_screen) {
                 HD44780_PCF8574_DisplayClear(addr);
@@ -365,31 +384,6 @@ int UserInterface_loop (void)
             } else if (current_screen == SCREEN_5) {
                 LCD_DrawScreen5();
             }
-            flag_update_lcd = 0;
-        }
-        return 0;
+                    
     }
     
-void UserInterface_interrupt (uint8_t n_ovfs)
-{
-    flag_update_lcd = 1;
-    if (n_ovfs % 50 == 0)
-    {
-        flag_tick = 1;
-    }
-    if (n_ovfs % 100 == 0)
-    {
-        flag_tick = 0;
-    }
-    if (n_ovfs == 180)
-    {
-        if (current_screen < 3)
-        {
-            current_screen++;
-        }
-        else if (current_screen == 3)
-        {
-            current_screen = 0;
-        }
-    }
-}
