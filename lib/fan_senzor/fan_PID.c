@@ -19,8 +19,7 @@ float integral1 = 0;    // Integral term for TEMP1
  
 float prev_error2 = 0;  // Previous error for TEMP2 
 float integral2 = 0;    // Integral term for TEMP2 
- 
-int target_temp = 0;  // Target temperature 
+
  
 //volatile uint8_t timer_flag = 0; // Flag for timer interrupt neni potreba, resi se  v mainu
  
@@ -30,7 +29,8 @@ int target_temp = 0;  // Target temperature
 }  */
  
 // PID control function 
-uint8_t pid_control(float current_temp, float *prev_error, float *integral) { 
+uint8_t pid_control(float target_temp, float current_temp, float *prev_error, float *integral) { 
+    
     float error = current_temp - target_temp;  // Error should be positive if temp > target 
     *integral += error;                        // Calculate integral term 
  
@@ -49,15 +49,14 @@ uint8_t pid_control(float current_temp, float *prev_error, float *integral) {
  
     return (uint8_t)output; // Return as 8-bit integer 
 } 
- 
 // Fan control with conditional PID 
 void fan_control_pid(void) { 
     char buffer[50]; 
  
     // Fan 1 (TEMP1) 
     memset(buffer, 0, sizeof(buffer)); // Clear buffer 
-    if (TEMP1 > target_temp) { 
-        uint8_t pwm1 = pid_control(TEMP1, &prev_error1, &integral1); 
+    if (TEMP1 > max_temp1) { 
+        uint8_t pwm1 = pid_control(max_temp1, TEMP1, &prev_error1, &integral1); 
         pwm_set_duty_cycle(pwm1);  
         sprintf(buffer, "Fan 1 ON at %d%%\r\n", (pwm1 * 100) / 255); 
     } else { 
@@ -68,8 +67,8 @@ void fan_control_pid(void) {
  
     // Fan 2 (TEMP2) 
     memset(buffer, 0, sizeof(buffer)); // Clear buffer 
-    if (TEMP2 > target_temp) { 
-        uint8_t pwm2 = pid_control(TEMP2, &prev_error2, &integral2); 
+    if (TEMP2 > max_temp2) { 
+        uint8_t pwm2 = pid_control(max_temp2, TEMP2, &prev_error2, &integral2); 
         pwm_set_duty_cycle(pwm2);  
         sprintf(buffer, "Fan 2 ON at %d%%\r\n", (pwm2 * 100) / 255); 
     } else { 
