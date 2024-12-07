@@ -18,14 +18,14 @@
 void outputControl_init(void)
 {
     // Set output pin(s) in Data Direction Register
-    GPIO_mode_output(&DDRB, LED_LIGHT);
+    GPIO_mode_output(&DDRD, LED_LIGHT);
 
     // Set pin(s) LOW in Data Register
-    GPIO_write_low(&PORTB, LED_LIGHT);
+    GPIO_write_low(&PORTD, LED_LIGHT);
 }
 
     // Infinite loop
 void outputControl_loop(void)
     {
-        GPIO_write(LED, &PORTB, LED_LIGHT)
+        GPIO_write(!LED, &PORTD, LED_LIGHT);
     }
