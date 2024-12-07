@@ -18,11 +18,13 @@
 #include <stdlib.h>         // C library. Needed for number conversions
 #include <stdio.h>          // Standardní knihovna
 #include "variables.h"      // globální proměnné
+#include "DHT.h"
 
 //---- NAŠE KNIHOVNY------------------------------------------------
 #include "rtc_control.h"    // čízení reálného času
 #include "UserInterface.h"  // UI a ovládání
 #include "fan_PID.h"        // Ovládání ventilátorů
+
 
 /**
  * @desc   Main function
