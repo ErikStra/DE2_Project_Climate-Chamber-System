@@ -85,14 +85,14 @@ void rtc_set_time(uint8_t hours, uint8_t minutes, uint8_t secs) {
     twi_start();
     twi_write((RTC_ADR << 1) | TWI_WRITE);
     twi_write(RTC_SEC_MEM);
-    twi_write((secs));
-    twi_write((minutes));
-    twi_write((hours));
+    twi_write(secs);
+    twi_write(minutes);
+    twi_write(hours);
     twi_stop();
 }
 
 // Funkce pro inicializaci RTC
-void rtc_initialize(void) {
+ void rtc_initialize(void) {
     // Čtení sekund z RTC pro kontrolu platnosti času
     twi_start();
     twi_write((RTC_ADR << 1) | TWI_WRITE);
@@ -101,18 +101,15 @@ void rtc_initialize(void) {
 
     twi_start();
     twi_write((RTC_ADR << 1) | TWI_READ);
-    uint8_t secs = twi_read(TWI_NACK);  // Čtení sekund
-    twi_stop();
+    uint8_t minutes = twi_read(TWI_NACK);  // Čtení sekund
+    twi_stop(); 
 
-    // Kontrola, zda je čas platný
-    if (1)//secs == 0 || secs == 0xFF || bcdToDec(secs) > 59)
+  if (1)//secs == 0 || secs == 0xFF || bcdToDec(secs) > 59)
     {
         // Nastavení času z kompilace
-        /* uint8_t hours = atoi(__TIME__);
+        uint8_t hours = atoi(__TIME__);
         uint8_t minutes = atoi(__TIME__ + 3);
-        uint8_t secs = atoi(__TIME__ + 6); */
-
-        
+        uint8_t secs = atoi(__TIME__ + 6);
 
         rtc_set_time(hours, minutes, secs);
         uart_puts("[INFO] RTC initialized with compile time\r\n");
@@ -120,6 +117,8 @@ void rtc_initialize(void) {
         uart_puts("[INFO] RTC time is valid\r\n");
     }
 }
+
+
 
 uint8_t compare_time_with_sun(uint8_t currentHour, uint8_t sunrise, uint8_t sunset) {
     
@@ -157,9 +156,9 @@ void rtc_read_time() {
 
     twi_start();
     twi_write((RTC_ADR << 1) | TWI_READ);
-    secs = twi_read(TWI_ACK);
-    minutes = twi_read(TWI_ACK);
-    hours = twi_read(TWI_NACK);
+    secs = bcdToDec(twi_read(TWI_ACK));
+    minutes = bcdToDec(twi_read(TWI_ACK));
+    hours = bcdToDec(twi_read(TWI_NACK));
     twi_stop();
 }
 
@@ -199,26 +198,3 @@ uint8_t decToBcd(uint8_t val) {
     rtc_read_time();
     new_sensor_data = 1;
 } */
-
-#include <stdio.h>
-#include <time.h>
-
-void rtc_set_time_from_system() {
-    // Získání aktuálního času
-    time_t now = time(NULL);
-    struct tm *local_time = localtime(&now);
-
-    // Získání hodin, minut, sekund
-    uint8_t hours = local_time->tm_hour;
-    uint8_t minutes = local_time->tm_min;
-    uint8_t seconds = local_time->tm_sec;
-
-    // Nastavení RTC (příklad)
-    rtc_set_time(hours, minutes, seconds);
-}
-
-int main() {
-    rtc_set_time_from_system();
-    printf("RTC nastaven na aktuální čas.\n");
-    return 0;
-}

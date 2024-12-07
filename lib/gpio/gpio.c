@@ -70,6 +70,27 @@ void GPIO_write_high(volatile uint8_t *reg, uint8_t pin)
 }
 
 /**********************************************************************
+ * Function: GPIO_write()
+ * Purpose:  Write one pin to defined value.
+ * Input(s): level: 1 or 0
+             reg - Address of Port Register, such as &PORTB
+ *           pin - Pin designation in the interval 0 to 7
+ * Returns:  none
+ **********************************************************************/
+void GPIO_write(uint8_t level, volatile uint8_t *reg, uint8_t pin)
+{
+    if (level)
+    {
+        *reg = *reg | (1<<pin);
+        
+    }
+    else
+    {
+        *reg = *reg & ~(1<<pin);
+    }
+}
+
+/**********************************************************************
  * Function: GPIO_write_toggle()
  * Purpose:  Write one pin to opposite value.
  * Input(s): reg - Address of Port Register, such as &PORTB

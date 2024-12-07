@@ -24,6 +24,8 @@
 #include "rtc_control.h"    // čízení reálného času
 #include "UserInterface.h"  // UI a ovládání
 #include "fan_PID.h"        // Ovládání ventilátorů
+#include "outputControl.h"  // Ovládání GPIO pinů
+#include "dht.h"
 
 
 /**
@@ -38,8 +40,12 @@ volatile uint8_t flag_UI_input_loop = 0;
 volatile uint8_t flag_UI_display_loop = 0;
 volatile uint8_t flag_fan_PID = 0;
 volatile uint8_t flag_RTC = 0;
+volatile uint8_t flag_outputControl = 0;
+volatile uint8_t flag_dht_update_temp1 = 0;
 
 uint16_t n_ovfs = 0;
+
+
 
 int main(void)
 {
@@ -55,6 +61,7 @@ int main(void)
     UserInterface_init();
     rtc_control_init();
     fan_PID_init();
+    outputControl_init();
     
 
   while (1)
@@ -84,6 +91,19 @@ int main(void)
       flag_RTC = 0;
     }
 
+    if(flag_outputControl)
+    {
+      outputControl_loop();
+      flag_RTC = 0;
+    }
+
+    if(flag_dht_update_temp1)
+    {
+      dht_update_temp1();
+      flag_RTC = 0;
+    }
+
+
   
   
   }
@@ -112,10 +132,19 @@ ISR(TIMER0_OVF_vect)
     if (n_ovfs % 63 == 0) //cca každou 1s
     {
       //flag_fan_PID=1;
+      flag_outputControl = 1;
+      flag_dht_update_temp1 = 1;
+
+    }
+
+    if (n_ovfs % 4*63 == 0) //cca každou 1s
+    {
+      flag_dht_update_temp1 = 1;
+
     }
     
     n_ovfs++;
-    if (n_ovfs >= 100)
+    if (n_ovfs >= 500)
     {
         n_ovfs = 0;
     }
