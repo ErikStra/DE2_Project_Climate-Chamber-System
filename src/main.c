@@ -24,6 +24,7 @@
 #include "UserInterface.h"  // UI a ovládání
 #include "fan_PID.h"        // Ovládání ventilátorů
 #include "outputControl.h"  // Ovládání GPIO pinů
+#include "dht.h"
 
 /**
  * @desc   Main function

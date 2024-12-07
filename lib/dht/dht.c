@@ -48,7 +48,7 @@ void dht_read_data(uint8_t *data) {
 void dht_update_temp1(void)
 {
     char buffer[10];
-    uint8_t dht_data[5]
+    uint8_t dht_data[5];
     dht_read_data(dht_data);
     uint8_t temp_int = dht_data[2];  // Integer part of temperature
     uint8_t temp_dec = dht_data[3];  // Decimal part of temperature
