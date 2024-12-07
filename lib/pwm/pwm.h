@@ -4,10 +4,14 @@
 #include <avr/io.h>
 
 // Pin definitions
-#define FAN_PIN PB1  // Define the pin for the fan (D9 or OC1A)
+#define FAN1_PIN PD5  // Define the pin for Fan 1 (OC0B, Arduino Nano pin D5)
+#define FAN2_PIN PD6  // Define the pin for Fan 2 (OC0A, Arduino Nano pin D6)
 
 // Function declarations
-void pwm_init(void);
-void pwm_set_duty_cycle(uint8_t duty_cycle);
+void pwm_init_PD5(void); // Initialize PWM for PD5 (OC0B)
+void pwm_init_PD6(void); // Initialize PWM for PD6 (OC0A)
+
+void pwm_set_duty_cycle_1(uint8_t duty_cycle); // Set duty cycle for Fan 1 (PD5)
+void pwm_set_duty_cycle_2(uint8_t duty_cycle); // Set duty cycle for Fan 2 (PD6)
 
 #endif  // PWM_H
