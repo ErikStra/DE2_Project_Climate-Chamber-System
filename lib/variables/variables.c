@@ -18,9 +18,8 @@ uint8_t pump = 0;
 uint8_t wlevel = 1;     
 
 // Proměnné pro nastavení
-int8_t max_temp = 25;       
-int8_t min_temp = 15; 
-int8_t max_LED_temp = 40;      
+int8_t max_temp1 = 25;       
+int8_t max_temp2 = 15; 
 int8_t max_airhum = 75;     
 int8_t min_airhum = 65;     
 int8_t control = 0;         

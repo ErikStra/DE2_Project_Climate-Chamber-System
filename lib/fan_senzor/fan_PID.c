@@ -31,7 +31,6 @@ int target_temp = 0;  // Target temperature
  
 // PID control function 
 uint8_t pid_control(float current_temp, float *prev_error, float *integral) { 
-    target_temp = (max_temp-min_temp)/2;
     float error = current_temp - target_temp;  // Error should be positive if temp > target 
     *integral += error;                        // Calculate integral term 
  
@@ -71,10 +70,10 @@ void fan_control_pid(void) {
     memset(buffer, 0, sizeof(buffer)); // Clear buffer 
     if (TEMP2 > target_temp) { 
         uint8_t pwm2 = pid_control(TEMP2, &prev_error2, &integral2); 
-        pwm_set_duty_cycle_2(pwm2);  
+        pwm_set_duty_cycle(pwm2);  
         sprintf(buffer, "Fan 2 ON at %d%%\r\n", (pwm2 * 100) / 255); 
     } else { 
-        pwm_set_duty_cycle_2(0); // Turn off fan 
+        pwm_set_duty_cycle(0); // Turn off fan 
         sprintf(buffer, "Fan 2 OFF\r\n"); 
     } 
     uart_puts(buffer); 

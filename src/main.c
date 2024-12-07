@@ -109,7 +109,7 @@ ISR(TIMER0_OVF_vect)
 
     if (n_ovfs % 63 == 0) //cca každou 1s
     {
-      flag_fan_PID=1;
+      //flag_fan_PID=1;
     }
     
     n_ovfs++;
