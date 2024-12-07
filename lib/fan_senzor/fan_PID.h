@@ -25,7 +25,7 @@
    * @return void
    */
 
- uint8_t pid_control(float current_temp, float *prev_error, float *integral);
+  uint8_t pid_control(float target_temp, float current_temp, float *prev_error, float *integral);
  void fan_control_pid(void);
  int fan_PID_init(void);
  int fan_PID_loop(void);

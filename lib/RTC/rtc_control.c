@@ -9,6 +9,7 @@
 #include <uart.h>
 #include <rtc_control.h>
 #include <variables.h>
+#include <time.h>
 
 #define RTC_ADR 0x68
 #define RTC_SEC_MEM 0
@@ -107,9 +108,11 @@ void rtc_initialize(void) {
     if (1)//secs == 0 || secs == 0xFF || bcdToDec(secs) > 59)
     {
         // Nastavení času z kompilace
-        uint8_t hours = atoi(__TIME__);
+        /* uint8_t hours = atoi(__TIME__);
         uint8_t minutes = atoi(__TIME__ + 3);
-        uint8_t secs = atoi(__TIME__ + 6);
+        uint8_t secs = atoi(__TIME__ + 6); */
+
+        
 
         rtc_set_time(hours, minutes, secs);
         uart_puts("[INFO] RTC initialized with compile time\r\n");
