@@ -1,8 +1,8 @@
 /** 
  * ---------------------------------------------------+ 
- * @desc        User Interface Library h
+ * @desc        PID library h
  * ---------------------------------------------------+ 
- * @copyright   Copyright (C) 2024  Kostenko, Zobac
+ * @copyright   Copyright (C) 2024  Kostenko
  * @email       
  * @author      
  * @datum       25.11.2024
