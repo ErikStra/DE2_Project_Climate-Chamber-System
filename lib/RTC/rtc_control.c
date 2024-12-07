@@ -199,3 +199,26 @@ uint8_t decToBcd(uint8_t val) {
     rtc_read_time();
     new_sensor_data = 1;
 } */
+
+#include <stdio.h>
+#include <time.h>
+
+void rtc_set_time_from_system() {
+    // Získání aktuálního času
+    time_t now = time(NULL);
+    struct tm *local_time = localtime(&now);
+
+    // Získání hodin, minut, sekund
+    uint8_t hours = local_time->tm_hour;
+    uint8_t minutes = local_time->tm_min;
+    uint8_t seconds = local_time->tm_sec;
+
+    // Nastavení RTC (příklad)
+    rtc_set_time(hours, minutes, seconds);
+}
+
+int main() {
+    rtc_set_time_from_system();
+    printf("RTC nastaven na aktuální čas.\n");
+    return 0;
+}
