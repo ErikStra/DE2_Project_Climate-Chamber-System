@@ -2,7 +2,7 @@
  * ---------------------------------------------------+ 
  * @desc        User Interface Library h
  * ---------------------------------------------------+ 
- * @copyright   Copyright (C) 2024  Kostenko
+ * @copyright   Copyright (C) 2024  Kostenko, Zobac
  * @email       
  * @author      
  * @datum       25.11.2024
