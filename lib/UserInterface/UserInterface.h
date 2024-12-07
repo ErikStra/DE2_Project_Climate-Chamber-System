@@ -24,13 +24,14 @@
    * @return void
    */
   int UserInterface_init (void);
-  int UserInterface_loop (void);
+  void UserInterface_input_loop (void);
+  void UserInterface_display_loop (uint16_t n_ovfs);
   void LCD_DrawScreen1(void);
   void LCD_DrawScreen2(void);
   void LCD_DrawScreen3(void);
   void LCD_DrawScreen4(void);
   void LCD_DrawScreen5(void);
   void HandleInput(char input);
-  void UserInterface_interrupt (uint8_t n_ovfs);
+  
 
 #endif

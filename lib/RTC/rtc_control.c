@@ -59,7 +59,7 @@ void rtc_control_init(void) {
 }
 
 void rtc_control_loop(void) {
-        if (new_sensor_data) {
+        //if (new_sensor_data) { už není potřeba, bude se to řešit v mainu
             // Porovnání aktuálního času s časy východu a západu
             compare_time_with_sun(hours, sunrise, sunset);         
             
@@ -81,8 +81,8 @@ void rtc_control_loop(void) {
             uart_puts(string);
             uart_puts("\n");
             
-            new_sensor_data = 0;
-        }
+            //new_sensor_data = 0;
+        
     }
 
 void rtc_set_time(uint8_t hours, uint8_t minutes, uint8_t secs) {
@@ -182,7 +182,7 @@ uint8_t decToBcd(uint8_t val) {
     return (val / 10 * 16) + (val % 10);
 }
 
-void rtc_control_interrupt(void) {
+/* void rtc_control_interrupt(void) { všechno se to bude volat v mainu
     rtc_read_time();
     new_sensor_data = 1;
-}
+} */

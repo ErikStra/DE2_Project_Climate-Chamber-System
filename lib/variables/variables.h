@@ -21,7 +21,8 @@ extern uint8_t wlevel;
 
 // Proměnné pro nastavení
 extern int8_t max_temp;       
-extern int8_t min_temp;       
+extern int8_t min_temp;     
+extern int8_t max_LED_temp;  
 extern int8_t max_airhum;     
 extern int8_t min_airhum;     
 extern int8_t control;         

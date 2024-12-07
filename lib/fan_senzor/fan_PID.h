@@ -14,8 +14,8 @@
 #include <stdio.h>          // Standardní knihovna
 
 /** @definition */
-#ifndef __FAN_SENSOR_H__
-#define __FAN_SENSOR_H__
+#ifndef __FAN_PID_H__
+#define __FAN_PID_H__
 
   /**
    * @desc   Voltmeter
@@ -25,9 +25,10 @@
    * @return void
    */
 
-  void fan_control(uint8_t temperature);
-  void SaveTemp (void);
-  int FanSenzor_init(void);
-  int FanSenzor_loop();
+ uint8_t pid_control(float current_temp, float *prev_error, float *integral);
+ void fan_control_pid(void);
+ int fan_PID_init(void);
+ int fan_PID_loop(void);
+
 
 #endif

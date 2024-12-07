@@ -19,9 +19,10 @@
 #include <stdio.h>          // Standardní knihovna
 #include "variables.h"      // globální proměnné
 
+//---- NAŠE KNIHOVNY------------------------------------------------
 #include "rtc_control.h"    // čízení reálného času
-#include "UserInterface.h"
-#include "fan_senzor.h"
+#include "UserInterface.h"  // UI a ovládání
+#include "fan_PID.h"        // Ovládání ventilátorů
 
 /**
  * @desc   Main function
@@ -31,7 +32,13 @@
  * @return int
  */
 
-uint8_t flag_fansensor = 0;
+volatile uint8_t flag_UI_input_loop = 0;
+volatile uint8_t flag_UI_display_loop = 0;
+volatile uint8_t flag_fan_PID = 0;
+volatile uint8_t flag_RTC = 0;
+
+uint16_t n_ovfs = 0;
+
 int main(void)
 {
   // inits
@@ -45,19 +52,37 @@ int main(void)
     
     UserInterface_init();
     rtc_control_init();
-    //FanSenzor_init();
+    fan_PID_init();
     
 
   while (1)
   {
-  UserInterface_loop();
-  rtc_control_loop();
+    if(flag_UI_input_loop)
+    {
+      UserInterface_input_loop();
+      flag_UI_input_loop=0;
+    }
 
-  if(flag_fansensor==1)
-  {
-    //FanSenzor_loop();
-    flag_fansensor=0;
-  }
+    if(flag_UI_display_loop)
+    {
+      UserInterface_display_loop(n_ovfs);
+      flag_UI_display_loop=0;
+    }
+  
+    if(flag_fan_PID)
+    {
+      fan_PID_loop();
+      flag_fan_PID=0;
+    }
+
+    if(flag_RTC)
+    {
+      rtc_read_time();
+      rtc_control_loop();
+      flag_RTC = 0;
+    }
+
+  
   
   }
   // EXIT
@@ -67,20 +92,24 @@ int main(void)
 }
 ISR(TIMER0_OVF_vect)
 {
-    static uint8_t n_ovfs = 0;
-    
-    
-
-    if (n_ovfs % 20 == 0)
+    if (n_ovfs % 6 == 0) //cca každých 100 ms
     {
-      UserInterface_interrupt(n_ovfs);
+      flag_UI_input_loop=1;
     }
 
-    if (n_ovfs == 51)
+    if (n_ovfs % 13 == 0) //cca každých 200 ms
     {
-      rtc_control_interrupt();
-      flag_fansensor=1;
-      
+      flag_UI_display_loop=1;
+    }
+
+    if (n_ovfs % 31 == 0) //cca každých 500 ms
+    {
+      flag_RTC=1;
+    }
+
+    if (n_ovfs % 63 == 0) //cca každou 1s
+    {
+      flag_fan_PID=1;
     }
     
     n_ovfs++;
@@ -88,5 +117,4 @@ ISR(TIMER0_OVF_vect)
     {
         n_ovfs = 0;
     }
-    // Else do nothing and exit the ISR
 }

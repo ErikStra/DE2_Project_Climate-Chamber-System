@@ -2,10 +2,10 @@
 #include <avr/interrupt.h> 
 #include <stdio.h> 
 #include <string.h> // For memset 
-#include "timer.h" 
 #include "uart.h" 
 #include "pwm.h" 
-#include "variables.h" 
+#include "variables.h"
+#include "fan_PID.h" 
  
 #define F_CPU 16000000L 
  
@@ -20,17 +20,18 @@ float integral1 = 0;    // Integral term for TEMP1
 float prev_error2 = 0;  // Previous error for TEMP2 
 float integral2 = 0;    // Integral term for TEMP2 
  
-int target_temp = 25;  // Target temperature 
+int target_temp = 0;  // Target temperature 
  
-volatile uint8_t timer_flag = 0; // Flag for timer interrupt 
+//volatile uint8_t timer_flag = 0; // Flag for timer interrupt neni potreba, resi se  v mainu
  
 // Timer overflow interrupt service routine 
-ISR(TIMER1_OVF_vect) { 
+/* void fan_PID_interrupt(void) { Celý to hodím do mainu
     timer_flag = 1; // Set the flag when timer overflows 
-} 
+}  */
  
 // PID control function 
 uint8_t pid_control(float current_temp, float *prev_error, float *integral) { 
+    target_temp = (max_temp-min_temp)/2;
     float error = current_temp - target_temp;  // Error should be positive if temp > target 
     *integral += error;                        // Calculate integral term 
  
@@ -80,21 +81,21 @@ void fan_control_pid(void) {
 } 
  
 // Initialize system 
-int FanSenzor_init(void) { 
-    uart_init(UART_BAUD_SELECT(9600, F_CPU));  
+int fan_PID_init(void) { 
+    //uart_init(UART_BAUD_SELECT(9600, F_CPU));  Není potřeba, UARt init je už v mainu
     pwm_init();  
  
-    // Timer initialization 
-    TIM1_ovf_262ms();         // Set timer overflow to 262 ms 
-    TIM1_ovf_enable();        // Enable timer overflow interrupt 
-    sei();                    // Enable global interrupts 
+    // Timer initialization  -  není potřeba, taky je to v mainu
+    //TIM1_ovf_262ms();         // Set timer overflow to 262 ms 
+    //TIM1_ovf_enable();        // Enable timer overflow interrupt 
+    //sei();                    // Enable global interrupts 
  
     uart_puts("System initialized.\r\n"); 
     return 0;  
 } 
  
 // Main loop for fan control 
-int FanSenzor_loop(void) {  
+int fan_PID_loop(void) {  //přejmenoval jsem funkci, aby byla konzistentní s názvem souboru
     char buffer[20]; 
  
     // Output current TEMP1 and TEMP2 
@@ -112,7 +113,7 @@ int FanSenzor_loop(void) {
     return 0;  
 } 
  
-int main(void) { 
+/* int main(void) {  - Celé toto se bude spouštět v mainu
     FanSenzor_init(); // Initialize system 
  
     while (1) { 
@@ -123,4 +124,5 @@ int main(void) {
     } 
  
     return 0; // This will never be reached 
-}
+} */
+

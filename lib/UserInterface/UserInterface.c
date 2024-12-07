@@ -336,7 +336,7 @@ int UserInterface_init(void) {
     }
     
     // Hlavní smyčka
-int UserInterface_loop (void)
+void UserInterface_input_loop (void)
     {
         // Zpracování vstupu
         uint16_t value = uart_getc();
@@ -344,9 +344,32 @@ int UserInterface_loop (void)
             uart_putc(value); // Výpis přijatého znaku do konzole
             HandleInput((char)value);
         }
+    }
+
+void UserInterface_display_loop (uint16_t n_ovfs){
+
+            if (n_ovfs % 50 == 0)
+            {
+                flag_tick = 1;
+            }
+            if (n_ovfs % 100 == 0)
+            {
+                flag_tick = 0;
+            }
+            if (n_ovfs == 180)
+            {
+                if (current_screen < 3)
+                {
+                    current_screen++;
+                }
+                else if (current_screen == 3)
+                {
+                    current_screen = 0;
+                }
+            }
+        
 
         // Aktualizace displeje
-        if (flag_update_lcd) {
             // Smazání displeje při změně obrazovky
             if (current_screen != last_screen) {
                 HD44780_PCF8574_DisplayClear(addr);
@@ -365,31 +388,6 @@ int UserInterface_loop (void)
             } else if (current_screen == SCREEN_5) {
                 LCD_DrawScreen5();
             }
-            flag_update_lcd = 0;
-        }
-        return 0;
+                    
     }
     
-void UserInterface_interrupt (uint8_t n_ovfs)
-{
-    flag_update_lcd = 1;
-    if (n_ovfs % 50 == 0)
-    {
-        flag_tick = 1;
-    }
-    if (n_ovfs % 100 == 0)
-    {
-        flag_tick = 0;
-    }
-    if (n_ovfs == 180)
-    {
-        if (current_screen < 3)
-        {
-            current_screen++;
-        }
-        else if (current_screen == 3)
-        {
-            current_screen = 0;
-        }
-    }
-}
