@@ -23,6 +23,7 @@
 #include "rtc_control.h"    // čízení reálného času
 #include "UserInterface.h"  // UI a ovládání
 #include "fan_PID.h"        // Ovládání ventilátorů
+#include "outputControl.h"  // Ovládání GPIO pinů
 
 /**
  * @desc   Main function
@@ -36,6 +37,7 @@ volatile uint8_t flag_UI_input_loop = 0;
 volatile uint8_t flag_UI_display_loop = 0;
 volatile uint8_t flag_fan_PID = 0;
 volatile uint8_t flag_RTC = 0;
+volatile uint8_t flag_outputControl = 0;
 
 uint16_t n_ovfs = 0;
 
@@ -53,6 +55,7 @@ int main(void)
     UserInterface_init();
     rtc_control_init();
     fan_PID_init();
+    outputControl_init();
     
 
   while (1)
@@ -82,6 +85,13 @@ int main(void)
       flag_RTC = 0;
     }
 
+    if(flag_outputControl)
+    {
+      outputControl_loop();
+      flag_RTC = 0;
+    }
+
+
   
   
   }
@@ -110,6 +120,8 @@ ISR(TIMER0_OVF_vect)
     if (n_ovfs % 63 == 0) //cca každou 1s
     {
       //flag_fan_PID=1;
+      flag_outputControl = 1;
+
     }
     
     n_ovfs++;

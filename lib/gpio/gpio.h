@@ -73,6 +73,15 @@ void GPIO_write_low(volatile uint8_t *reg, uint8_t pin);
 void GPIO_write_high(volatile uint8_t *reg, uint8_t pin);
 
 /**
+ * @brief  Write one pin to high value.
+ * @param  level 1 or 0
+ * @param  reg Address of Port Register, such as &PORTB
+ * @param  pin Pin designation in the interval 0 to 7
+ * @return none
+ */
+void GPIO_write(uint8_t level, volatile uint8_t *reg, uint8_t pin);
+
+/**
  * @brief  Write one pin to opposite value.
  * @param  reg Address of Port Register, such as &PORTB
  * @param  pin Pin designation in the interval 0 to 7
