@@ -54,10 +54,7 @@ void dht_update_temp1(void)
     uint8_t temp_dec = dht_data[3];  // Decimal part of temperature
     // Send temperature data via UART
     uart_puts("Raw Temperature: ");
-    itoa(temp_int, buffer, 10);
-    uart_puts(buffer);
-    uart_puts(".");
-    itoa(temp_dec, buffer, 10);
+    itoa(dht_data, buffer, 10);
     uart_puts(buffer);
     uart_puts(" °C\r\n");
 }
