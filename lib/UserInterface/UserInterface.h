@@ -32,6 +32,10 @@
   void LCD_DrawScreen4(void);
   void LCD_DrawScreen5(void);
   void HandleInput(char input);
-  
-
+  void int_to_string(int16_t input, char *output);
+  void processCommand(char *command);
+  void remove_trailing_newline(char *str);
+  void uart_getcommand();
+  void cleanString(char *input);
+  int countSemicolons(const char *str);
 #endif

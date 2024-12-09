@@ -25,10 +25,7 @@
 
 /* Struktura RTC */
 
-uint8_t secs = 0;
-
-
-char string[3];
+//char string[3];
 
 volatile uint8_t new_sensor_data = 0;
 
@@ -55,16 +52,13 @@ void rtc_control_init(void) {
     // Test RTC
     if (twi_test_address(RTC_ADR) != 0) {
         uart_puts("[ERROR] RTC not detected\r\n");
-        while (1);
     }
 }
 
 void rtc_control_loop(void) {
-        //if (new_sensor_data) { už není potřeba, bude se to řešit v mainu
-            // Porovnání aktuálního času s časy východu a západu
-            compare_time_with_sun(hours, sunrise, sunset);         
+        compare_time_with_sun(hours, sunrise, sunset);         
             
-            // Výpis na UART
+            /* // Výpis na UART
             itoa((hours), string, 10);
             uart_puts(string);
             uart_puts(":");
@@ -74,10 +68,7 @@ void rtc_control_loop(void) {
             itoa((secs), string, 10);
             uart_puts(string);
             uart_puts(" ");
-            uart_puts(LED ? "ON\r\n" : "OFF\r\n");
-           
-            
-            //new_sensor_data = 0;
+            uart_puts(LED ? "ON\r\n" : "OFF\r\n"); */
         
     }
 
@@ -129,7 +120,7 @@ uint8_t compare_time_with_sun(uint8_t currentHour, uint8_t sunrise, uint8_t suns
         LED = (currentHour >= sunrise && currentHour < sunset);
     }
 
-    itoa(sunrise, string, 10);
+    /* itoa(sunrise, string, 10);
     uart_puts(string);
     uart_puts("         ");
     itoa(sunset, string, 10);
@@ -140,7 +131,7 @@ uint8_t compare_time_with_sun(uint8_t currentHour, uint8_t sunrise, uint8_t suns
     uart_puts("         ");
     itoa(LED, string, 10);
     uart_puts(string);
-    uart_puts("\n");
+    uart_puts("\n"); */
 
 
     eeprom_write_byte((uint8_t*)EEPROM_LIGHT_STATE_ADDR, LED);
@@ -193,8 +184,3 @@ uint8_t bcdToDec(uint8_t val) {
 uint8_t decToBcd(uint8_t val) {
     return (val / 10 * 16) + (val % 10);
 }
-
-/* void rtc_control_interrupt(void) { všechno se to bude volat v mainu
-    rtc_read_time();
-    new_sensor_data = 1;
-} */

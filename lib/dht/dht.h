@@ -1,17 +1,37 @@
-#ifndef DHT_H
-#define DHT_H
+#ifndef __DHT_H__
+#define __DHT_H__
 
+/*
+ * DHT Sensor for AVR-GCC Family
+ *
+ * Author      : David Feng
+ * Updated     : June 26th, 2018
+ * Description : DHT Sensor Library for AVR-GCC compiler
+ * Usage       : Use library with AVR-GCC for Atmega family of microcontrollers (tested with Atmega 1284)
+ */
+
+#include <stdio.h>
 #include <avr/io.h>
-#include <util/delay.h>
 
-// Pin definitions
-#define DHT_PIN PD2  // Define the pin for DHT sensor
+//Port where DHT sensor is connected
+#define DHT_DDR DDRD
+#define DHT_PORT PORTD
+#define DHT_PIN PIND
+#define DHT_INPUTPIN 4
 
-// Function declarations
-void dht_request(void);
-uint8_t dht_response(void);
-uint8_t dht_read_byte(void);
-void dht_read_data(uint8_t *data);
-void dht_update_temp1(void);
+//Define sensor type
+#define DHT_DHT11 0
+#define DHT_DHT22 1
+#define DHT_TYPE DHT_DHT22
 
-#endif  // DHT_H
+//timeout retries
+#define DHT_TIMEOUT 200
+
+//functions
+#if DHT_TYPE == 1
+extern int8_t dht_GetTempUtil(uint16_t *temperature, uint16_t *humidity);
+#elif DHT_TYPE == 0
+extern int8_t dht_GetTempUtil(int8_t *temperature, int8_t *humidity);
+#endif
+
+#endif

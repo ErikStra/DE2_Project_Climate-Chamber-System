@@ -27,16 +27,8 @@
    *
    * @return uint8_t Calculated PWM duty cycle
    */
-  uint8_t pid_control(float target_temp, float current_temp, float *prev_error, float *integral);
-
+  uint8_t pid_control(int16_t actual_temp, int16_t target_temp, int16_t *prev_error, int32_t *integral, uint8_t KP, uint8_t KI, uint8_t KD);
   /**
-   * @desc   Controls the fans using PID
-   *
-   * @param  void
-   *
-   * @return void
-   */
-  void fan_control_pid(void);
 
   /**
    * @desc   Initializes the fan PID system

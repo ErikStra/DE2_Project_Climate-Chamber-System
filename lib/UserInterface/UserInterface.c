@@ -4,6 +4,9 @@
 #include <stdlib.h>         // C library. Needed for number conversions
 #include "hd44780pcf8574.h" // LCD i2C library
 #include <stdio.h>          // Standardní knihovna
+#include <string.h>
+#include <ctype.h>          // Pro funkci isdigit()
+
 #include "twi.h"            //I2C knihovna Tomáše Fryzy
 #include "UserInterface.h"  // hlavičkový soubor této knihovny
 #include "variables.h"      // globální proměnné
@@ -16,15 +19,12 @@
 #define SCREEN_4 2
 #define SCREEN_5 1
 #define TOTAL_SCREENS 5
-#define SETTINGS_COUNT 12
+#define SETTINGS_COUNT 11
 
 
 
 // Pole pro zobrazení časových plánů
-const char *control_options[8] = {"Temp.  ", "AirHum.", "None   "};
-const char *autowater_options[5] = {"Cont.  ", "Once ", "Off  "};
-const char *ONOFF_options[3] = {"off", "ON"};
-const char *HILO_options[2] = {"HI", "lo"};
+const char *ONOFF_options[3] = {"off", "on "};
 
 // Další proměnné
 char addr = PCF8574_ADDRESS; // Adresa LCD
@@ -39,7 +39,7 @@ volatile uint8_t flag_tick = 0;
 
 // -- Funkce pro vykreslování ---------------------------------------
 void LCD_DrawScreen2() {
-    char buffer[13];
+    char buffer[14];
     char buffer2[11];
 
     // indikátor
@@ -49,53 +49,49 @@ void LCD_DrawScreen2() {
 
     switch (selected_setting) {
         case 0:
-            snprintf(buffer, 13, "SETTINGS    ");
+            snprintf(buffer, 14, "SETTINGS    ");
             snprintf(buffer2, 5, "udrl     ");
 
             break;
-        case 1: // Max Temp
-            snprintf(buffer, 13, "Max Temp.");
-            snprintf(buffer2, 6, "%d%cC ", max_temp1, 223);
+        case 1: // Max Temperature (TEMP1)
+            snprintf(buffer, 14, "Max Temp.");
+            snprintf(buffer2, 6, "%d%cC    ", max_temp1, 223);
             break;
-        case 2: // Min Temp
-            snprintf(buffer, 13, "Max LED temp.");
-            snprintf(buffer2, 6, "%d%cC ", max_temp2, 223);
+        case 2: // Max LED temperature (TEMP2)
+            snprintf(buffer, 14, "Max LED temp.");
+            snprintf(buffer2, 6, "%d%cC    ", max_temp2, 223);
             break;
         case 3: // Max AirHum
-            snprintf(buffer, 13, "Max Air Hum.");
-            snprintf(buffer2, 6, "%d %% ", max_airhum);
-            break;
-        case 4: // Min AirHum
-            snprintf(buffer, 13, "Min Air Hum.");
-            snprintf(buffer2, 6, "%d %% ", min_airhum);
-            break;
-        case 5: // Control 
-            snprintf(buffer, 13, "Control     ");
-            snprintf(buffer2, 11, "%s", control_options[control]);
+            snprintf(buffer, 14, "Max Air Hum. ");
+            snprintf(buffer2, 6, "%d %%    ", max_airhum);
+            break;            
+        case 4: // Control 
+            snprintf(buffer, 14, "Climate Cont.");
+            snprintf(buffer2, 11, "%s   ", ONOFF_options[control]);
             break;    
-        case 6: // Light ON time (Hour)
-            snprintf(buffer, 13, "Sunrise ");
+        case 5: // Light ON time (Hour)
+            snprintf(buffer, 14, "Sunrise      ");
             snprintf(buffer2, 7, "%d:00  ", sunrise);
             break;
-        case 7: //Light OFF time (HOUR)
-            snprintf(buffer, 13, "Sunset ");
+        case 6: //Light OFF time (HOUR)
+            snprintf(buffer, 14, "Sunset       ");
             snprintf(buffer2, 7, "%d:00  ", sunset);
             break;
-        case 8: // Max SoilHum
-            snprintf(buffer, 13, "Max Soil Hum");
-            snprintf(buffer2, 6, "%d %% ", max_soilhum);
-            break;
-        case 9: // Min SoilHum
-            snprintf(buffer, 13, "Min Soil Hum");
+        case 7:
+            snprintf(buffer, 14, "Light Cont.  ");
+            snprintf(buffer2, 11, "%s   ", ONOFF_options[autolight]);
+            break;   
+        case 8: // Min SoilHum
+            snprintf(buffer, 14, "Min Soil Hum.");
             snprintf(buffer2, 6, "%d %% ", min_soilhum);
             break;
-        case 10: //watering time (HOUR)
-            snprintf(buffer, 13, "Watering Time");
+        case 9: //watering time (HOUR)
+            snprintf(buffer, 14, "Watering Time");
             snprintf(buffer2, 7, "%d:00 ", water_time);
             break;
-        case 11: // Autowatering time options
-            snprintf(buffer, 13, "Watering Mode");
-            snprintf(buffer2, 11, "%s", autowater_options[autowater]);
+        case 10: // Autowatering time options
+            snprintf(buffer, 14, "Auto watering");
+            snprintf(buffer2, 11, "%s   ", ONOFF_options[autowater]);
             break;
     }
     //řádek 1
@@ -106,38 +102,46 @@ void LCD_DrawScreen2() {
     HD44780_PCF8574_PositionXY(addr, 0, 1);
     HD44780_PCF8574_DrawString(addr, buffer2);
 }
-
+//domovská obrazovka - zobrazuje teplotu 1, vlhkost 1 a 2 a čas
 void LCD_DrawScreen1() {
     char buffer[16];
+    char buffer2[4];
 
-    // indikátor
+   /*  // indikátor
     HD44780_PCF8574_PositionXY(addr, 15, 0);
     //snprintf(buffer, 3, "1/%d", TOTAL_SCREENS);
-    HD44780_PCF8574_DrawString(addr, "1");
+    HD44780_PCF8574_DrawString(addr, "1"); */
 
-    // Řádek 1
+    // Humidity 1
     HD44780_PCF8574_PositionXY(addr, 0, 0);
-    snprintf(buffer, 16, "Ha:%2d%% Hs:%2d%%", HUM1, HUM2);
+    int_to_string(HUM1, buffer2);
+    snprintf(buffer, 16, "H1=%s%%", buffer2);
     HD44780_PCF8574_DrawString(addr, buffer);
 
-    // Řádek 2
-    HD44780_PCF8574_PositionXY(addr, 0, 1);
-    snprintf(buffer, 16, "Tair:%2d%cC", TEMP1, 223);
+    //humidity 2
+    HD44780_PCF8574_PositionXY(addr, 10, 0);
+    //int_to_string(HUM2, buffer2);
+    snprintf(buffer, 16, "H2=%d%%", HUM2/10);
     HD44780_PCF8574_DrawString(addr, buffer);
+
+    // teplota 1
+    HD44780_PCF8574_PositionXY(addr, 0, 1);
+    int_to_string(TEMP1, buffer2);
+    snprintf(buffer, 16, "T1=%s%cC", buffer2, 223);
+    HD44780_PCF8574_DrawString(addr, buffer);
+
+    //hodiny    
     HD44780_PCF8574_PositionXY(addr, 11, 1);
     if (flag_tick == 1)
-    {
-        snprintf(buffer, 16, "%2d:%2d", hours, minutes);
-    }
+    {snprintf(buffer, 16, "%02d:%02d", hours, minutes);}
     else
-    {
-        snprintf(buffer, 16, "%2d %2d", hours, minutes);
-    }
+    {snprintf(buffer, 16, "%02d %02d", hours, minutes);}
     HD44780_PCF8574_DrawString(addr, buffer);
 }
 
-void LCD_DrawScreen3() {
+void LCD_DrawScreen3() { //prázdná obrazovka, kterou možná na něco použiju pozdějc
     char buffer[17];
+    uint8_t buffer2 = 0;
     
     // indikátor
     HD44780_PCF8574_PositionXY(addr, 15, 0);
@@ -146,16 +150,35 @@ void LCD_DrawScreen3() {
 
     // Řádek 1
     HD44780_PCF8574_PositionXY(addr, 0, 0);
-    snprintf(buffer, 17, "EMPTY SCREEN");
+    snprintf(buffer, 17, "PMP:%s S%d A%d", ONOFF_options[pump], min_soilhum, HUM2/10);
     HD44780_PCF8574_DrawString(addr, buffer);
 
-    // Řádek 2
     HD44780_PCF8574_PositionXY(addr, 0, 1);
-    snprintf(buffer, 16, "%d = %c", chartest, chartest);
+    if (autowater)
+    {
+        if (wlevel)
+        {
+            if (water_time>hours)
+                {buffer2 = water_time-hours;}
+            else
+                {buffer2 = 24-hours+water_time;}
+            snprintf(buffer, 17, "watering in %dhr", buffer2);
+        }
+        else
+        {
+            snprintf(buffer, 17, "refill water");
+        } 
+    }
+    else
+    {
+        snprintf(buffer, 17, "autowatering off");
+    }
     HD44780_PCF8574_DrawString(addr, buffer);
+    
+    
 }
 
-void LCD_DrawScreen4() {
+void LCD_DrawScreen4() { // obrazovka se statistikami ventilátorů
     char buffer[17];
     
     // indikátor
@@ -163,34 +186,55 @@ void LCD_DrawScreen4() {
     //snprintf(buffer, 3, "4/%d", TOTAL_SCREENS);
     HD44780_PCF8574_DrawString(addr, "3");
 
-    // Řádek 1
+    //ventilátor 1
     HD44780_PCF8574_PositionXY(addr, 0, 0);
-    snprintf(buffer, 17, "FAN1:%d%%", fan_big);
+    snprintf(buffer, 17, "F1=%2d%% S%-2d A%-2d", fan_big, TEMP1/10, max_temp1);
     HD44780_PCF8574_DrawString(addr, buffer);
 
     // Řádek 2
     HD44780_PCF8574_PositionXY(addr, 0, 1);
-    snprintf(buffer, 17, "FN2:%d%% FN3:%d%%", fan_small, fan_led);
+    snprintf(buffer, 17, "F2=%2d%% S%-2d A%-2d", fan_led, TEMP2/10, max_temp2);
     HD44780_PCF8574_DrawString(addr, buffer);
 }
 
-void LCD_DrawScreen5() {
+void LCD_DrawScreen5() { //obrazovka se statistikami osvětlení
     char buffer[17];
     
     // indikátor
     HD44780_PCF8574_PositionXY(addr, 15, 0);
-    //snprintf(buffer, 3, "5/%d", TOTAL_SCREENS);
+    snprintf(buffer, 3, "5/%d", TOTAL_SCREENS);
     HD44780_PCF8574_DrawString(addr, "2");
 
     // Řádek 1
     HD44780_PCF8574_PositionXY(addr, 0, 0);
-    snprintf(buffer, 17, "LED:%s %d%cC",ONOFF_options[LED], TEMP2, 223);
+    snprintf(buffer, 17, "LED:%3s %d.%d%cC",ONOFF_options[LED], TEMP2/10, TEMP2%10, 223);
     HD44780_PCF8574_DrawString(addr, buffer);
 
+    uint8_t buffer2 = 0;
     // Řádek 2
     HD44780_PCF8574_PositionXY(addr, 0, 1);
-    snprintf(buffer, 17, "PUMP:%s lvl:%s", ONOFF_options[pump], HILO_options[wlevel]);
+    if (LED)
+    {
+        if (sunset>hours)
+        {buffer2 = sunset-hours;}
+        else
+        {buffer2 = 24-hours + sunset;}  
+        snprintf(buffer, 17, "sunset in %dhr", buffer2);
+
+    }
+    else
+    {
+        if (sunrise>hours)
+        {buffer2 = sunrise-hours;}
+        else
+        {buffer2 = 24-hours + sunrise;}
+        snprintf(buffer, 17, "sunrise in %dhr", buffer2);
+    }
     HD44780_PCF8574_DrawString(addr, buffer);
+    
+
+    
+    
 }
 
 
@@ -212,39 +256,29 @@ void HandleInput(char input) {
                         max_temp1--; } break;
                 case 2: // Max LED temp
                     if (max_temp2 > 0) {
-                        max_temp2--;
-                    }
+                        max_temp2--;} break;
                 case 3: // Max airhum
-                    if (max_airhum > min_airhum) {
-                        max_airhum--; } break;
-                case 4: // Min airhum
-                    if (min_airhum > 0) {
-                        min_airhum--;
-                    }
-                    if (min_airhum > max_airhum) { // Zajištění platného intervalu
-                        min_airhum = max_airhum; } break;
-                case 5: // Control
+                    if (max_airhum > 0) {
+                        max_airhum--; } break;        
+                case 4: // Control
                     if (control > 0) {
                         control--; } break;
-                case 6: // Sunrise
+                case 5: // Sunrise
                     if (sunrise > 0) {
                         sunrise--; } break;
-                case 7: // Sunset
+                case 6: // Sunset
                     if (sunset > 0) {
                         sunset--; } break;
-                case 8: // Max soilhum
-                    if (max_soilhum > min_soilhum) {
-                        max_soilhum--; } break;
-                case 9: // Min soilhum
+                case 7: // autolight
+                    if (autolight > 0) {
+                        autolight--; } break;
+                case 8: // Min soilhum
                     if (min_soilhum > 0) {
-                        min_soilhum--;
-                    }
-                    if (min_soilhum > max_soilhum) { // Zajištění platného intervalu
-                        min_soilhum = max_soilhum; } break;
-                case 10: // watering time
+                        min_soilhum--; } break;
+                case 9: // watering time
                     if (water_time > 0) {
                         water_time--; } break;
-                case 11: // watering time
+                case 10: // autowatering
                     if (autowater > 0) {
                         autowater--; } break;
             }
@@ -254,43 +288,33 @@ void HandleInput(char input) {
                     break;
                 case 1: // Max Temp
                     if (max_temp1 < 50) {
-                        max_temp1++;
-                    }
+                        max_temp1++;} break;
                 case 2: // Min Temp
                     if (max_temp2 < 50) {
                         max_temp2++; } break;
                 case 3: // Max airhum
                     if (max_airhum < 100) {
-                        max_airhum++;
-                    }
-                    if (max_airhum < min_airhum) { // Zajištění platného intervalu
-                        max_airhum = min_airhum; } break;
-                case 4: // Min airhum
-                    if (min_airhum < max_airhum) {
-                        min_airhum++; } break;
-                case 5: // Control
-                    if (control < 2) {
+                        max_airhum++;} break;
+                case 4: // Control
+                    if (control < 1) {
                         control++; } break;
-                case 6: // Sunrise
+                case 5: // Sunrise
                     if (sunrise < 23) {
                         sunrise++; } break;
-                case 7: // Sunrise
+                case 6: // Sunrise
                     if (sunset < 23) {
                         sunset++; } break;
-                case 8: // Max soilhum
-                    if (max_soilhum < 100) {
-                        max_soilhum++;
-                    }
-                    if (max_soilhum < min_soilhum) { // Zajištění platného intervalu
-                        max_soilhum = min_soilhum; } break;
-                case 9: // Min soilhum
-                    if (min_soilhum < max_soilhum) {
+                case 7: // watering mode
+                    if (autolight < 1) {
+                        autolight++; } break;
+                case 8: // Min soilhum
+                    if (min_soilhum < 100) {
                         min_soilhum++; } break;
-                case 10: // watering time
+                case 9: // watering time
                     if (water_time < 23) {
                         water_time++; } break;
-                case 11: // watering mode
-                    if (autowater < 2) {
+                case 10: // watering mode
+                    if (autowater < 1) {
                         autowater++; } break;
                 
                     
@@ -318,7 +342,7 @@ int UserInterface_init(void) {
     
     
     char uart_msg[10];
-    uart_puts("Scanning I2C... ");
+    uart_puts("[INFO]Scanning I2C... ");
     for (uint8_t sla = 8; sla < 120; sla++)
     {
         if (twi_test_address(sla) == 0)  // If ACK from Slave
@@ -327,7 +351,7 @@ int UserInterface_init(void) {
             uart_puts(uart_msg);
         }
     }
-    uart_puts("\r\nDone");
+    uart_puts("\r\n...Done\r\n");
     return 0;
     }
     
@@ -344,15 +368,15 @@ void UserInterface_input_loop (void)
 
 void UserInterface_display_loop (uint16_t n_ovfs){
 
-            if (n_ovfs % 50 == 0)
+            if (n_ovfs % 30 == 0)
             {
                 flag_tick = 1;
             }
-            if (n_ovfs % 100 == 0)
+            if (n_ovfs % 60 == 0)
             {
                 flag_tick = 0;
             }
-            if (n_ovfs == 180)
+            if (n_ovfs == 240)
             {
                 if (current_screen < 3)
                 {
@@ -386,4 +410,102 @@ void UserInterface_display_loop (uint16_t n_ovfs){
             }
                     
     }
-    
+
+void int_to_string(int16_t input, char *output) {
+sprintf(output, "%d.%d", input/ 10, input % 10);
+}
+
+void processCommand(char *command) {
+    char buffer[50];
+    if (strcmp(command, "upload settings") >= 0) {
+        cleanString(command);
+        if (countSemicolons(command) == 10){
+            sscanf(command, "%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d", 
+                         max_temp1, max_temp2, max_airhum, min_soilhum, sunrise, sunset, water_time, control, autolight, autowater);
+            snprintf(buffer, 50, "%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d", max_temp1, max_temp2, max_airhum, min_soilhum, sunrise, sunset, water_time, control, autolight, autowater);
+            uart_puts(buffer);
+            uart_puts("\r\n[INFO] Settings saved\n");
+        } else{
+            uart_puts("[ERROR] Wrong format. Insert settings in format: \r\n upload settings MaxT1; MaxT2; MaxH1; MinH2; sunrise; sunset; water time; control; autolight; autowater\r\n");
+        }
+    } else if (strcmp(command, "stats") == 0) {
+            snprintf(buffer, 50, "%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d", TEMP1, TEMP2, HUM1, HUM2, LED, fan_big, fan_led, HEATER, pump, wlevel, hours, minutes, secs);
+            uart_puts(buffer);            
+    } else {
+        uart_puts("\r\n[ERROR] Unknown command\n");
+    }
+}
+
+void remove_trailing_newline(char *str) {
+    char *pos;
+    if ((pos = strchr(str, '\n')) != NULL) *pos = '\0';
+    if ((pos = strchr(str, '\r')) != NULL) *pos = '\0';
+}
+
+char buffer[50] = {0}; // Buffer pro příjem dat
+size_t buffer_index = 0;
+
+void uart_getcommand(){
+    unsigned int received = uart_getc();
+    // Zpracování, pokud přijde platný znak
+    if (!(received & UART_NO_DATA)) {
+        char c = (char)received;
+        HandleInput(c);
+        // Echo znaku zpět na UART
+        uart_putc(c);
+
+        // Pokud je Enter (detekujeme '\n' nebo '\r')
+        if (c == '\n' || c == '\r') {
+            // Zkontrolujeme, jestli buffer není prázdný
+            if (buffer_index > 0) {
+                buffer[buffer_index] = '\0'; // Ukončíme řetězec
+                uart_puts("\r");   // Přidáme nový řádek pro čitelnost
+                uart_puts("received command: ");
+                uart_puts(buffer);   // Vypíšeme obsah bufferu pro debug
+                uart_puts("\r\n");   // Další nový řádek
+                processCommand(buffer);
+
+                // Zpracujeme příkaz
+                
+
+                // Reset bufferu a buffer_indexu
+                memset(buffer, '\0', sizeof(buffer)); // Vymažeme buffer
+                buffer_index = 0;
+            }
+        } else {
+            // Přidáme znak do bufferu, pokud není buffer plný
+            if (buffer_index < sizeof(buffer) - 1) {
+                buffer[buffer_index++] = c;
+            } else {
+                uart_puts("\r\n[ERROR] Buffer overflow, resetting...\r\n");
+                memset(buffer, '\0', sizeof(buffer)); // Vymažeme buffer
+                buffer_index = 0;
+            }
+        }
+    }
+}
+
+
+void cleanString(char *input) {
+    int i = 0, j = 0;
+    while (input[i] != '\0') {
+        // Pokud je znak číslice nebo středník, přidáme ho do výsledného řetězce
+        if (isdigit(input[i]) || input[i] == ';') {
+            input[j++] = input[i];
+        }
+        i++;
+    }
+    // Ukončíme řetězec na správném místě
+    input[j] = '\0';
+}
+
+int countSemicolons(const char *str) {
+    int count = 0;
+    while (*str) {
+        if (*str == ';') {
+            count++;
+        }
+        str++;
+    }
+    return count;
+}

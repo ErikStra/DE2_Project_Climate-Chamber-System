@@ -8,8 +8,7 @@
 #define FAN2_PIN PD6  // Define the pin for Fan 2 (OC0A, Arduino Nano pin D6)
 
 // Function declarations
-void pwm_init_PD5(void); // Initialize PWM for PD5 (OC0B)
-void pwm_init_PD6(void); // Initialize PWM for PD6 (OC0A)
+void pwm_init(void); // Initialize PWM
 
 void pwm_set_duty_cycle_1(uint8_t duty_cycle); // Set duty cycle for Fan 1 (PD5)
 void pwm_set_duty_cycle_2(uint8_t duty_cycle); // Set duty cycle for Fan 2 (PD6)

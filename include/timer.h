@@ -103,14 +103,12 @@
  * @note  t_OVF = 1/F_CPU * prescaler * 2^n where n = 8, F_CPU = 16 MHz
  */
 // WRITE YOUR CODE HERE
-#define TIM2_OVF_16MS() TCCR2B |= (1<<CS22) | (1<<CS21) | (1<<CS20);
+#define TIM2_ovf_16ms() TCCR2B |= (1<<CS22) | (1<<CS21) | (1<<CS20);
 
-#define TIM2_OVF_ENABLE() TIMSK2 |= (1<<TOIE2);
+#define TIM2_ovf_enable() TIMSK2 |= (1<<TOIE2);
 
-#define TIM2_OVF_DISABLE() TIMSK2 &= ~(1<<TOIE2);
+#define TIM2_ovf_disable() TIMSK2 &= ~(1<<TOIE2);
 
-
-#define TIM3_ovf_25ms() T
 
 
 /** @} */

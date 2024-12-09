@@ -9,116 +9,67 @@
 
 #define F_CPU 16000000L
 
-// PID variables
-float kp = 5.0;  // Proportional gain
-float ki = 0.5;  // Integral gain
-float kd = 1.0;  // Derivative gain
+int16_t prev_error1 = 0;
+int32_t integral1 = 0;
 
-float prev_error1 = 0;  // Previous error for TEMP1
-float integral1 = 0;    // Integral term for TEMP1
+int16_t prev_error2 = 0;
+int32_t integral2 = 0;
 
-float prev_error2 = 0;  // Previous error for TEMP2
-float integral2 = 0;    // Integral term for TEMP2
+// Funkce pro řízení ventilátoru
+uint8_t pid_control(int16_t actual_temp, int16_t target_temp, int16_t *prev_error, int32_t *integral, uint8_t KP, uint8_t KI, uint8_t KD) {
+    // Převod hodnot zintegrovaných vynásobením 10 zpět do odpovídající škály
+    int16_t error = target_temp - actual_temp;  // Rozdíl mezi cílem a skutečností
 
-//volatile uint8_t timer_flag = 0; // Flag for timer interrupt, no longer needed (handled in main)
+    // Aktualizace integrální složky
+    *integral += error;
 
-/* 
-// Timer overflow interrupt service routine 
-void fan_PID_interrupt(void) {
-    timer_flag = 1; // Set the flag when timer overflows 
-}
-*/
+    // Omezení pro integrální složku (anti-windup)
+    if (*integral > 500) *integral = 500;
+    if (*integral < -500) *integral = -500;
 
-// PID control function
-uint8_t pid_control(float target_temp, float current_temp, float *prev_error, float *integral) {
-    float error = current_temp - target_temp;  // Error should be positive if temp > target
-    *integral += error;                        // Calculate integral term
+    // Výpočet derivační složky
+    int16_t derivative = error - *prev_error;
+    *prev_error = error;
 
-    // Clamp the integral term to avoid wind-up
-    if (*integral > 50) *integral = 50;
-    if (*integral < -50) *integral = -50;
+    // PID výpočet
+    float output = (KP * error) + (KI * (*integral / 10.0)) + (KD * derivative);
 
-    float derivative = error - *prev_error;    // Calculate derivative term
-    *prev_error = error;                       // Update previous error
-
-    float output = (kp * error) + (ki * *integral) + (kd * derivative); // PID formula
-
-    // Clamp output to valid PWM range (0-255)
+    // Oříznutí výstupu do rozsahu 0–255
     if (output > 255) output = 255;
     if (output < 0) output = 0;
 
-    return (uint8_t)output; // Return as 8-bit integer
-}
-
-// Fan control with conditional PID
-void fan_control_pid(void) {
-    char buffer[50];
-
-    // Fan 1 (TEMP1)
-    memset(buffer, 0, sizeof(buffer)); // Clear buffer
-    if (TEMP1 > max_temp1) {
-        uint8_t pwm1 = pid_control(max_temp1, TEMP1, &prev_error1, &integral1);
-        pwm_set_duty_cycle_1(pwm1);  // Use the updated function for Fan 1 (PD5)
-        sprintf(buffer, "Fan 1 ON at %d%%\r\n", (pwm1 * 100) / 255);
-    } else {
-        pwm_set_duty_cycle_1(0); // Turn off Fan 1
-        sprintf(buffer, "Fan 1 OFF\r\n");
-    }
-    uart_puts(buffer);
-
-    // Fan 2 (TEMP2)
-    memset(buffer, 0, sizeof(buffer)); // Clear buffer
-    if (TEMP2 > max_temp2) {
-        uint8_t pwm2 = pid_control(max_temp2, TEMP2, &prev_error2, &integral2);
-        pwm_set_duty_cycle_2(pwm2);  // Use the updated function for Fan 2 (PD6)
-        sprintf(buffer, "Fan 2 ON at %d%%\r\n", (pwm2 * 100) / 255);
-    } else {
-        pwm_set_duty_cycle_2(0); // Turn off Fan 2
-        sprintf(buffer, "Fan 2 OFF\r\n");
-    }
-    uart_puts(buffer);
+    // Návrat jako střída PWM
+    return (uint8_t)output;
 }
 
 // Initialize system
 int fan_PID_init(void) {
-    pwm_init_PD5();  // Initialize PWM for Fan 1 (PD5)
-    pwm_init_PD6();  // Initialize PWM for Fan 2 (PD6)
-
-    uart_puts("System initialized.\r\n");
+    pwm_init();  // Initialize PWM
+    uart_puts("[INFO] PID system initialized.\r\n");
     return 0;
 }
 
 // Main loop for fan control
-int fan_PID_loop(void) {  // Renamed function to match file name consistency
-    char buffer[20];
+int fan_PID_loop(void) { 
+     // Fan 1 (TEMP1)
+    if (TEMP1 > max_temp1*10) {
+        uint8_t pwm1 = pid_control(max_temp1*10, TEMP1, &prev_error1, &integral1, KP1, KI1, KD1);
+        if (HUM1> max_airhum && pwm1<drying_speed){
+            fan_big = drying_speed;
+        } else {
+            fan_big = pwm1; //sprintf(buffer, "Fan 1 ON at %d%%\r\n", (pwm1 * 100) / 255);
+        }
+    } else {
+            fan_big = 0;
+    }
 
-    // Output current TEMP1 and TEMP2
-    memset(buffer, 0, sizeof(buffer)); // Clear buffer
-    sprintf(buffer, "TEMP1: %d°C\r\n", TEMP1);
-    uart_puts(buffer);
-
-    memset(buffer, 0, sizeof(buffer)); // Clear buffer
-    sprintf(buffer, "TEMP2: %d°C\r\n", TEMP2);
-    uart_puts(buffer);
-
-    // Control fans with conditional PID
-    fan_control_pid();
+    // Fan 2 (TEMP2)
+    if (TEMP2 > max_temp2) {
+        uint8_t pwm2 = pid_control(max_temp2*10, TEMP2, &prev_error2, &integral2, KP2, KI2, KD2);
+        fan_led = pwm2;
+    } else {
+        fan_led = 0;
+    }
 
     return 0;
 }
-
-/* 
-// Main function (runs in main program)
-int main(void) {
-    FanSenzor_init(); // Initialize system
-
-    while (1) {
-        if (timer_flag) { // Check timer flag
-            timer_flag = 0; // Clear the flag
-            FanSenzor_loop(); // Execute main loop logic
-        }
-    }
-
-    return 0; // This will never be reached
-}
-*/
