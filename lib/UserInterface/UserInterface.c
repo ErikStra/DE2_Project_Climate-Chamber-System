@@ -188,12 +188,12 @@ void LCD_DrawScreen4() { // obrazovka se statistikami ventilátorů
 
     //ventilátor 1
     HD44780_PCF8574_PositionXY(addr, 0, 0);
-    snprintf(buffer, 17, "F1=%2d%% S%-2d A%-2d", fan_big, TEMP1/10, max_temp1);
+    snprintf(buffer, 17, "F1=%2d%% S%-2d A%-2d", fan_big/2.55, TEMP1/10, max_temp1);
     HD44780_PCF8574_DrawString(addr, buffer);
 
     // Řádek 2
     HD44780_PCF8574_PositionXY(addr, 0, 1);
-    snprintf(buffer, 17, "F2=%2d%% S%-2d A%-2d", fan_led, TEMP2/10, max_temp2);
+    snprintf(buffer, 17, "F2=%2d%% S%-2d A%-2d", fan_led/2.55, TEMP2/10, max_temp2);
     HD44780_PCF8574_DrawString(addr, buffer);
 }
 
@@ -419,11 +419,42 @@ void processCommand(char *command) {
     char buffer[50];
     if (strcmp(command, "upload settings") >= 0) {
         cleanString(command);
-        if (countSemicolons(command) == 10){
-            sscanf(command, "%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d", 
-                         max_temp1, max_temp2, max_airhum, min_soilhum, sunrise, sunset, water_time, control, autolight, autowater);
-            snprintf(buffer, 50, "%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d", max_temp1, max_temp2, max_airhum, min_soilhum, sunrise, sunset, water_time, control, autolight, autowater);
-            uart_puts(buffer);
+        if (countSemicolons(command) == 9){
+
+
+        char *token;
+        int16_t num[9];
+
+        // Get the first token (before the first comma)
+        token = strtok(command, ";");
+        
+        uint8_t i = 0;
+        while (token != NULL) {// Loop through the string to get all tokens
+            // Convert the token to an integer
+            num[i] = atoi(token);
+            
+            // Print the integer (or you can store it in an array if needed)
+            snprintf(buffer, 5, "%2d", num[i]);
+            uart_puts(buffer); uart_puts("\n\r");
+
+            // Get the next token
+            token = strtok(NULL, ";");
+            i++;
+        }
+            max_temp1 = num[0];
+            max_temp2 = num[1];
+            max_airhum = num[2];
+            min_soilhum = num[3];
+            sunrise = num[4];
+            sunset = num[5];
+            water_time = num[6];
+            control = num[7];
+            autolight = num[8];
+            autowater = num[9];
+
+
+            /* snprintf(buffer, 100, "%d;%d;%d;%d;%d;%d;%d;%d;%d;%d", max_temp1, max_temp2, max_airhum, min_soilhum, sunrise, sunset, water_time, control, autolight, autowater);
+            uart_puts(buffer); */
             uart_puts("\r\n[INFO] Settings saved\n");
         } else{
             uart_puts("[ERROR] Wrong format. Insert settings in format: \r\n upload settings MaxT1; MaxT2; MaxH1; MinH2; sunrise; sunset; water time; control; autolight; autowater\r\n");
