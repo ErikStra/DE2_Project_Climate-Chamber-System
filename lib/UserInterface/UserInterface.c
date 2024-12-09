@@ -188,12 +188,12 @@ void LCD_DrawScreen4() { // obrazovka se statistikami ventilátorů
 
     //ventilátor 1
     HD44780_PCF8574_PositionXY(addr, 0, 0);
-    snprintf(buffer, 17, "F1=%2d%% S%-2d A%-2d", fan_big/2.55, TEMP1/10, max_temp1);
+    snprintf(buffer, 17, "F1=%2d S%-2d A%-2d", fan_big, TEMP1/10, max_temp1);
     HD44780_PCF8574_DrawString(addr, buffer);
 
     // Řádek 2
     HD44780_PCF8574_PositionXY(addr, 0, 1);
-    snprintf(buffer, 17, "F2=%2d%% S%-2d A%-2d", fan_led/2.55, TEMP2/10, max_temp2);
+    snprintf(buffer, 17, "F2=%2d S%-2d A%-2d", fan_led, TEMP2/10, max_temp2);
     HD44780_PCF8574_DrawString(addr, buffer);
 }
 
@@ -460,7 +460,7 @@ void processCommand(char *command) {
             uart_puts("[ERROR] Wrong format. Insert settings in format: \r\n upload settings MaxT1; MaxT2; MaxH1; MinH2; sunrise; sunset; water time; control; autolight; autowater\r\n");
         }
     } else if (strcmp(command, "stats") == 0) {
-            snprintf(buffer, 50, "%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d", TEMP1, TEMP2, HUM1, HUM2, LED, fan_big, fan_led, HEATER, pump, wlevel, hours, minutes, secs);
+            snprintf(buffer, 50, "%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d", TEMP1, TEMP2, HUM1, HUM2, LED, fan_big, fan_led, pump, wlevel, hours, minutes, secs);
             uart_puts(buffer);            
     } else {
         uart_puts("\r\n[ERROR] Unknown command\n");
