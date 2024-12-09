@@ -23,8 +23,8 @@ extern uint8_t wlevel;
 extern uint16_t water_delay;
 
 // Proměnné pro nastavení
-extern int8_t max_temp1;       
-extern int8_t max_temp2;     
+extern int16_t max_temp1;       
+extern int16_t max_temp2;     
 extern int8_t max_airhum;     
 extern int8_t control;         
 extern uint8_t sunset;       

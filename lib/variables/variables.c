@@ -20,8 +20,8 @@ uint8_t pump = 0;
 uint8_t wlevel = 1;     
 
 // Proměnné pro nastavení
-int8_t max_temp1 = 25;       
-int8_t max_temp2 = 30;   
+int16_t max_temp1 = 250;       
+int16_t max_temp2 = 300;   
 int8_t max_airhum = 70;     
 int8_t control = 1;         
 uint8_t sunset = 22;       
@@ -34,9 +34,9 @@ int8_t chartest = 0;
 uint16_t water_delay = 1;
 
 // PID konstanty
-double KP1 = 2.0;  // Proporční konstanta
-double KI1 = 0.5;  // Integrální konstanta
-double KD1 = 1.0;  // Derivační konstanta
+double KP1 = 10.0;  // Proporční konstanta
+double KI1 = 0.0;  // Integrální konstanta
+double KD1 = 0.0;  // Derivační konstanta
 
 double KP2 = 2.0;  // Proporční konstanta
 double KI2 = 0.5;  // Integrální konstanta

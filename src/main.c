@@ -88,11 +88,11 @@ while (1) { // Nekonečná smyčka
     if(flag_fan_PID){
       fan_PID_loop();
 
-      char buffer[100];
+      /* char buffer[100];
       snprintf(buffer, sizeof(buffer), "KP1 = %d KI1 = %d KD1 = %d", (int) KP1*10, (int) KI1*10, (int) KD1*10);
       uart_puts(buffer);
       uart_puts("   \n\r");
-
+ */
       flag_fan_PID=0;
     }
 

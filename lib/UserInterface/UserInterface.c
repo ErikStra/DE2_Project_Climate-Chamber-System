@@ -127,7 +127,7 @@ void LCD_DrawScreen1() {
     // teplota 1
     HD44780_PCF8574_PositionXY(addr, 0, 1);
     int_to_string(TEMP1, buffer2);
-    snprintf(buffer, 16, "T1=%s%c", buffer2);
+    snprintf(buffer, 16, "T1=%s%c", buffer2, 223);
     HD44780_PCF8574_DrawString(addr, buffer);
 
     //hodiny    
@@ -182,18 +182,18 @@ void LCD_DrawScreen4() { // obrazovka se statistikami ventilátorů
     char buffer[17];
     
     // indikátor
-    HD44780_PCF8574_PositionXY(addr, 15, 0);
+    /* HD44780_PCF8574_PositionXY(addr, 15, 0);
     //snprintf(buffer, 3, "4/%d", TOTAL_SCREENS);
-    HD44780_PCF8574_DrawString(addr, "3");
+    HD44780_PCF8574_DrawString(addr, "3"); */
 
     //ventilátor 1
     HD44780_PCF8574_PositionXY(addr, 0, 0);
-    snprintf(buffer, 17, "F1=%2d S%-2d A%-2d", fan_big, max_temp1, TEMP1/10);
+    snprintf(buffer, 17, "F1=%-2d S%d.%dA%d.%d", (fan_big*100)/255, max_temp1/10, max_temp1 %10, TEMP1/10, TEMP1%10);
     HD44780_PCF8574_DrawString(addr, buffer);
 
     // Řádek 2
     HD44780_PCF8574_PositionXY(addr, 0, 1);
-    snprintf(buffer, 17, "F2=%2d S%-2d A%-2d", fan_led, max_temp2, TEMP2/10);
+    snprintf(buffer, 17, "F2=%-2d S%d.%dA%d.%d", (fan_led*100)/255, max_temp2/10, max_temp2 %10, TEMP2/10, TEMP2%10);
     HD44780_PCF8574_DrawString(addr, buffer);
 }
 
@@ -376,7 +376,7 @@ void UserInterface_display_loop (uint16_t n_ovfs){
             {
                 flag_tick = 0;
             }
-            if (n_ovfs == 240)
+            /* if (n_ovfs == 240)
             {
                 if (current_screen < 3)
                 {
@@ -386,7 +386,7 @@ void UserInterface_display_loop (uint16_t n_ovfs){
                 {
                     current_screen = 0;
                 }
-            }
+            } */
         
 
         // Aktualizace displeje
