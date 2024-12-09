@@ -97,27 +97,10 @@ void rtc_set_time(uint8_t hours, uint8_t minutes, uint8_t secs) {
 
   if (1)//secs == 0 || secs == 0xFF || bcdToDec(secs) > 59)
     {   
-        const char *buildTime = __TIME__;
-        int hours, minutes, secs;
-        char temp[3];
-
         // Nastavení času z kompilace
-       /*  uint8_t hours = atoi(temp, buildTime, 2);
-        temp[2]
-        uint8_t minutes = atoi(temp, buildTime + 3, 2);
-        temp[2]
-        uint8_t secs = atoi(temp, buildTime + 6, 2);
-        temp[2] */
-        
-        strncpy(temp, buildTime, 2);
-        temp[2];
-        hours = atoi(temp);
-        strncpy(temp, buildTime + 3, 2);
-        temp[2];
-        minutes = atoi(temp);
-        strncpy(temp, buildTime + 6, 2);
-        temp[2];
-        secs = atoi(temp);
+        uint8_t hours = atoi(__TIME__);
+        uint8_t minutes = atoi(__TIME__ + 3);
+        uint8_t secs = atoi(__TIME__ + 6);
 
         rtc_set_time(hours, minutes, secs);
         uart_puts("[INFO] RTC initialized with compile time\r\n");
