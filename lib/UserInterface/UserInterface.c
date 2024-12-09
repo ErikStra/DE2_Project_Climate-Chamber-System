@@ -127,13 +127,13 @@ void LCD_DrawScreen1() {
     // teplota 1
     HD44780_PCF8574_PositionXY(addr, 0, 1);
     int_to_string(TEMP1, buffer2);
-    snprintf(buffer, 16, "T1=%s%cC", buffer2, 223);
+    snprintf(buffer, 16, "T1=%s%c", buffer2);
     HD44780_PCF8574_DrawString(addr, buffer);
 
     //hodiny    
-    HD44780_PCF8574_PositionXY(addr, 11, 1);
-    if (flag_tick == 1)
-    {snprintf(buffer, 16, "%02d:%02d", hours, minutes);}
+    HD44780_PCF8574_PositionXY(addr, 8, 1);
+    if (1)//flag_tick == 1)
+    {snprintf(buffer, 16, "%02d:%02d:%02d", hours, minutes, secs);}
     else
     {snprintf(buffer, 16, "%02d %02d", hours, minutes);}
     HD44780_PCF8574_DrawString(addr, buffer);
@@ -188,12 +188,12 @@ void LCD_DrawScreen4() { // obrazovka se statistikami ventilátorů
 
     //ventilátor 1
     HD44780_PCF8574_PositionXY(addr, 0, 0);
-    snprintf(buffer, 17, "F1=%2d S%-2d A%-2d", fan_big, TEMP1/10, max_temp1);
+    snprintf(buffer, 17, "F1=%2d S%-2d A%-2d", fan_big, max_temp1, TEMP1/10);
     HD44780_PCF8574_DrawString(addr, buffer);
 
     // Řádek 2
     HD44780_PCF8574_PositionXY(addr, 0, 1);
-    snprintf(buffer, 17, "F2=%2d S%-2d A%-2d", fan_led, TEMP2/10, max_temp2);
+    snprintf(buffer, 17, "F2=%2d S%-2d A%-2d", fan_led, max_temp2, TEMP2/10);
     HD44780_PCF8574_DrawString(addr, buffer);
 }
 
@@ -207,7 +207,7 @@ void LCD_DrawScreen5() { //obrazovka se statistikami osvětlení
 
     // Řádek 1
     HD44780_PCF8574_PositionXY(addr, 0, 0);
-    snprintf(buffer, 17, "LED:%3s %d.%d%cC",ONOFF_options[LED], TEMP2/10, TEMP2%10, 223);
+    snprintf(buffer, 17, "LED:%3s %d.%d%cC",ONOFF_options[LED], TEMP2/100, TEMP2%100, 223);
     HD44780_PCF8574_DrawString(addr, buffer);
 
     uint8_t buffer2 = 0;
@@ -453,7 +453,7 @@ void processCommand(char *command) {
             autowater = num[9];
 
 
-            /* snprintf(buffer, 100, "%d;%d;%d;%d;%d;%d;%d;%d;%d;%d", max_temp1, max_temp2, max_airhum, min_soilhum, sunrise, sunset, water_time, control, autolight, autowater);
+            /*snprintf(buffer, 100, "%d;%d;%d;%d;%d;%d;%d;%d;%d;%d", max_temp1, max_temp2, max_airhum, min_soilhum, sunrise, sunset, water_time, control, autolight, autowater);
             uart_puts(buffer); */
             uart_puts("\r\n[INFO] Settings saved\n");
         } else{
@@ -461,10 +461,49 @@ void processCommand(char *command) {
         }
     } else if (strcmp(command, "stats") == 0) {
             snprintf(buffer, 50, "%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d", TEMP1, TEMP2, HUM1, HUM2, LED, fan_big, fan_led, pump, wlevel, hours, minutes, secs);
-            uart_puts(buffer);            
+            uart_puts(buffer);  
+    } else if (strcmp(command, "upload PID") >= 0){
+        cleanString(command);
+        if (countSemicolons(command) == 5){
+
+
+        char *token;
+        int16_t num[5];
+
+        // Get the first token (before the first comma)
+        token = strtok(command, ";");
+        
+        uint8_t i = 0;
+        while (token != NULL) {// Loop through the string to get all tokens
+            // Convert the token to an integer
+            num[i] = atoi(token);
+            
+            // Print the integer (or you can store it in an array if needed)
+            snprintf(buffer, 5, "%2d", num[i]);
+            uart_puts(buffer); uart_puts("\n\r");
+
+            // Get the next token
+            token = strtok(NULL, ";");
+            i++;
+        }
+            KP1 = num[0]/10;
+            KI1 = num[1]/10;
+            KD1= num[2]/10;
+            KP2 = num[3]/10;
+            KI2 = num[4]/10;
+            KD2 = num[5]/10;
+
+
+            /*snprintf(buffer, 100, "%d;%d;%d;%d;%d;%d;%d;%d;%d;%d", max_temp1, max_temp2, max_airhum, min_soilhum, sunrise, sunset, water_time, control, autolight, autowater);
+            uart_puts(buffer); */
+            uart_puts("\r\n[INFO] PID Settings saved\n");
+        } else{
+                uart_puts("[ERROR] Wrong format. Insert settings in format: \r\n upload PID KP1; KI1; KD1; KP2; KI2; KD2\r\n");
+        /* code */
+        }             
     } else {
         uart_puts("\r\n[ERROR] Unknown command\n");
-    }
+    } 
 }
 
 void remove_trailing_newline(char *str) {

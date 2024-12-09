@@ -24,14 +24,29 @@ void outputControl_init(void)
 
     // Set pin(s) LOW in Data Register
     GPIO_write_low(&PORTD, PD3);
-    GPIO_write_low(&PORTD, PD2);
+    GPIO_write_high(&PORTD, PD2);
 }
 
     // Infinite loop
 void outputControl_loop(void)
     {
         GPIO_write(!LED, &PORTD, PD3);
-        GPIO_write(!pump, &PORTD, PD2);
         pwm_set_duty_cycle_1(fan_big);
         pwm_set_duty_cycle_2(fan_led);
+
+        if (autowater && HUM2<min_soilhum && hours == water_time && minutes == 50 && secs < 1 && wlevel)
+        {
+            pump = 1;
+            GPIO_write(!pump, &PORTD, PD2);
+            _delay_ms(1000*water_delay);
+            pump = 0;
+            GPIO_write(!pump, &PORTD, PD2);
+        }
+        else{
+            pump = 0;
+            GPIO_write(!pump, &PORTD, PD2);
+        }
+        
+        
     }
+

@@ -25,7 +25,7 @@
 
 /* Struktura RTC */
 
-//char string[3];
+char string[3];
 
 volatile uint8_t new_sensor_data = 0;
 
@@ -76,9 +76,9 @@ void rtc_set_time(uint8_t hours, uint8_t minutes, uint8_t secs) {
     twi_start();
     twi_write((RTC_ADR << 1) | TWI_WRITE);
     twi_write(RTC_SEC_MEM);
-    twi_write(secs);
-    twi_write(minutes);
-    twi_write(hours);
+    twi_write(bcdToDec(secs));
+    twi_write(bcdToDec(minutes));
+    twi_write(bcdToDec(hours));
     twi_stop();
 }
 
@@ -92,20 +92,37 @@ void rtc_set_time(uint8_t hours, uint8_t minutes, uint8_t secs) {
 
     twi_start();
     twi_write((RTC_ADR << 1) | TWI_READ);
-    uint8_t minutes = twi_read(TWI_NACK);  // Čtení sekund
+    uint8_t secs = twi_read(TWI_NACK);  // Čtení sekund
     twi_stop(); 
 
   if (1)//secs == 0 || secs == 0xFF || bcdToDec(secs) > 59)
-    {
+    {   
+        const char *buildTime = __TIME__;
+        int hours, minutes, secs;
+        char temp[3];
+
         // Nastavení času z kompilace
-        uint8_t hours = atoi(__TIME__);
-        uint8_t minutes = atoi(__TIME__ + 3);
-        uint8_t secs = atoi(__TIME__ + 6);
+       /*  uint8_t hours = atoi(temp, buildTime, 2);
+        temp[2]
+        uint8_t minutes = atoi(temp, buildTime + 3, 2);
+        temp[2]
+        uint8_t secs = atoi(temp, buildTime + 6, 2);
+        temp[2] */
+        
+        strncpy(temp, buildTime, 2);
+        temp[2];
+        hours = atoi(temp);
+        strncpy(temp, buildTime + 3, 2);
+        temp[2];
+        minutes = atoi(temp);
+        strncpy(temp, buildTime + 6, 2);
+        temp[2];
+        secs = atoi(temp);
 
         rtc_set_time(hours, minutes, secs);
         uart_puts("[INFO] RTC initialized with compile time\r\n");
     } else {
-        uart_puts("[INFO] RTC time is valid\r\n");
+        uart_puts("[INFO] RTC time is valid \r\n");
     }
 }
 
@@ -120,7 +137,7 @@ uint8_t compare_time_with_sun(uint8_t currentHour, uint8_t sunrise, uint8_t suns
         LED = (currentHour >= sunrise && currentHour < sunset);
     }
 
-    /* itoa(sunrise, string, 10);
+   /*  itoa(sunrise, string, 10);
     uart_puts(string);
     uart_puts("         ");
     itoa(sunset, string, 10);

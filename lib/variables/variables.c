@@ -10,13 +10,14 @@ uint8_t minutes = 0;
 uint8_t secs = 0; 
 
 uint8_t LED = 0;           
-int16_t TEMP2 = 0;        
+int16_t TEMP2 = 0;
+int16_t PRESSURE = 0; 
 uint8_t fan_big = 0;     
 uint8_t fan_small = 0;   
 uint8_t fan_led = 0;
 
 uint8_t pump = 0;       
-uint8_t wlevel = 0;     
+uint8_t wlevel = 1;     
 
 // Proměnné pro nastavení
 int8_t max_temp1 = 25;       
@@ -26,10 +27,11 @@ int8_t control = 1;
 uint8_t sunset = 22;       
 uint8_t sunrise = 8;        
 int8_t min_soilhum = 30;     
-int8_t water_time = 8;       
+int8_t water_time = 11;       
 int8_t autowater = 1;
 int8_t autolight = 1;           
-int8_t chartest = 0;       
+int8_t chartest = 0;
+uint16_t water_delay = 1;
 
 // PID konstanty
 double KP1 = 2.0;  // Proporční konstanta

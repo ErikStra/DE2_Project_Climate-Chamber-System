@@ -12,13 +12,15 @@ extern uint8_t minutes;
 extern uint8_t secs;
 
 extern uint8_t LED;           
-extern int16_t TEMP2;        
+extern int16_t TEMP2;     
+extern int16_t PRESSURE;  
 extern uint8_t fan_big;     
 extern uint8_t fan_small;   
 extern uint8_t fan_led;    
 
 extern uint8_t pump;       
-extern uint8_t wlevel;     
+extern uint8_t wlevel;  
+extern uint16_t water_delay;
 
 // Proměnné pro nastavení
 extern int8_t max_temp1;       

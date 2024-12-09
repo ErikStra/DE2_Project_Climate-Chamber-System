@@ -54,18 +54,21 @@ int fan_PID_loop(void) {
      // Fan 1 (TEMP1)
     if (TEMP1 > max_temp1*10) {
         uint8_t pwm1 = pid_control(max_temp1*10, TEMP1, &prev_error1, &integral1, KP1, KI1, KD1);
-        if (HUM1> max_airhum && pwm1<drying_speed){
-            fan_big = drying_speed;
-        } else {
+        // docasne vypis na uart
+        
+
+       // if (HUM1> max_airhum && pwm1<drying_speed){
+            //fan_big = drying_speed;
+        //} else {
             fan_big = pwm1; //sprintf(buffer, "Fan 1 ON at %d%%\r\n", (pwm1 * 100) / 255);
-        }
+        //}
     } else {
             fan_big = 0;
     }
 
     // Fan 2 (TEMP2)
-    if (TEMP2 > max_temp2) {
-        uint8_t pwm2 = pid_control(max_temp2*10, TEMP2, &prev_error2, &integral2, KP2, KI2, KD2);
+    if (TEMP2 > max_temp2*100) {
+        uint8_t pwm2 = pid_control(max_temp2*100, TEMP2, &prev_error2, &integral2, KP2, KI2, KD2);
         fan_led = pwm2;
     } else {
         fan_led = 0;
