@@ -62,4 +62,11 @@ Write descriptive text and put simulation screenshots of your components.
 Write an instruction manual for your application, including photos and a link to a short app video.
 
 ## References
-
+1. [ADC from GitHub of Tomas Fryza](https://github.com/tomas-fryza/avr-course/tree/master/archive/labx-adc)
+2. [UART from GitHub of Tomas Fryza](https://github.com/tomas-fryza/avr-course/tree/master/lab5-uart)
+3. [twi from GitHub of Tomas Fryza](https://github.com/tomas-fryza/avr-course/tree/master/solutions/lab6-i2c-scan/lib/twi)
+4. [GPIO from GitHub of Tomas Fryza](https://github.com/tomas-fryza/avr-course/tree/master/lab2-gpio)
+5. [Datasheet of ATmega328p](https://www.microchip.com/en-us/product/ATmega328p)
+6. [Draw.io](https://app.diagrams.net)
+7. [Mermaid Editor]([https://mermaid-js.github.io])
+8. [ChatGPT]([https://chatgpt.com])
