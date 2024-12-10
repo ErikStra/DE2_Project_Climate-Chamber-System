@@ -68,5 +68,5 @@ Write an instruction manual for your application, including photos and a link to
 4. [GPIO from GitHub of Tomas Fryza](https://github.com/tomas-fryza/avr-course/tree/master/lab2-gpio)
 5. [Datasheet of ATmega328p](https://www.microchip.com/en-us/product/ATmega328p)
 6. [Draw.io](https://app.diagrams.net)
-7. [Mermaid Editor]([https://mermaid-js.github.io])
-8. [ChatGPT]([https://chatgpt.com])
+7. [Mermaid Editor](https://mermaid-js.github.io)
+8. [ChatGPT](https://chatgpt.com)
