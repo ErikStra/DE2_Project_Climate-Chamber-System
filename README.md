@@ -20,7 +20,18 @@
 
 ## Theoretical description and explanation
 
-Enter a description of the problem and how to solve it.
+Tropical plants require specific environmental conditions to thrive, including:
+
+ 1. Temperature: Maintaining a specific temperature range.
+ 2. Humidity: Ensuring consistent moisture levels in the air.
+ 3. Light: Providing the right light intensity and duration.
+ 4. Soil Moisture: Monitoring and watering plants appropriately.
+
+The goal is to build an automated system that:
+ • Monitors these parameters using sensors.
+ • Controls devices like fans, lights, and water pumps to maintain ideal conditions.
+ • Allows users to set preferences and view current conditions.
+
 
 ## Hardware description of demo application
 
