@@ -36,7 +36,40 @@ The goal is to build an automated system that:
 
 ## Hardware description of demo application
 
-Insert descriptive text and schematic(s) of your implementation.
+
+## 1. Sensors for Monitoring
+- **DHT Sensor**: Measures temperature and humidity to monitor the environment.
+- **BMP280 Sensor**: Provides additional environmental data, including pressure and temperature.
+- **RTC**: Measures real-time clock to support time-based operations.
+
+## 2. Actuators for Control
+- **Fans**: Regulate temperature and humidity.
+- **Lights**: Provide artificial lighting for photosynthesis.
+- **Water Pump**: Irrigates the soil automatically when moisture levels are low.
+
+## 3. User Interface
+- **LCD Display**: Displays the current environmental conditions to the user.
+- **UART Communication**: Allows users to adjust settings via a terminal interface.
+
+## 4. Control Logic
+- **PID Control**: We implemented precise fan operation using PID control logic.
+- **Lighting Schedule**: We used a real-time clock (RTC) to adjust lighting schedules dynamically based on sunrise and sunset times.
+- **Automated Watering**: We automated soil irrigation based on moisture levels detected by sensors.
+
+## 5. Microcontroller
+- We used an **Arduino Nano (ATmega328P)** to interface with all sensors and control actuators.
+
+## 6. Software Design
+- We developed modular code with clear responsibilities:
+  - **fan_PID.c**: Handles fan speed control using PID logic.
+  - **rtc_control.c**: Manages time-based operations and schedules.
+  - **outputControl.c**: Controls GPIO outputs, including lights and pumps.
+  - **variables.c**: Stores shared variables between different modules.
+
+- For efficient task management, we used flags and timers to organize and prioritize operations.
+
+
+
 
 ## Software description
 Variables flowchart
