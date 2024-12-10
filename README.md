@@ -28,6 +28,8 @@ Insert descriptive text and schematic(s) of your implementation.
 
 ## Software description
 ![flowchart_diagram](images/DE_2_diagram.svg)
+
+
 Put flowchats/state diagrams of your algorithm(s) and direct links to source/testbench files in src and sim folders.
 
 ## Component(s) simulation
