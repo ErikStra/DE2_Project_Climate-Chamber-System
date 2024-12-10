@@ -59,7 +59,13 @@ The goal is to build an automated system that:
 ## 5. Microcontroller
 - We used an **Arduino Nano (ATmega328P)** to interface with all sensors and control actuators.
 
-## 6. Software Design
+
+
+
+
+
+
+## Software description
 - We developed modular code with clear responsibilities:
   - **fan_PID.c**: Handles fan speed control using PID logic.
   - **rtc_control.c**: Manages time-based operations and schedules.
@@ -68,10 +74,6 @@ The goal is to build an automated system that:
 
 - For efficient task management, we used flags and timers to organize and prioritize operations.
 
-
-
-
-## Software description
 Variables flowchart
 
 ![flowchart_diagram](images/DE_2_diagram.svg)
