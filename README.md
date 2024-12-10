@@ -28,6 +28,11 @@ Insert descriptive text and schematic(s) of your implementation.
 
 ## Software description
 ![flowchart_diagram](images/DE_2_diagram.svg)
+Variables flowchart
+
+![fan_PID](images/fan_PID.svg)
+flowchart for fan_PID.c
+
 
 
 Put flowchats/state diagrams of your algorithm(s) and direct links to source/testbench files in src and sim folders.
