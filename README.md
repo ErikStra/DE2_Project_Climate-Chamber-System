@@ -27,17 +27,19 @@ Enter a description of the problem and how to solve it.
 Insert descriptive text and schematic(s) of your implementation.
 
 ## Software description
-![flowchart_diagram](images/DE_2_diagram.svg)
-
 Variables flowchart
 
-![fan_PID](images/fan_PID.svg)
+![flowchart_diagram](images/DE_2_diagram.svg)
 
 flowchart for fan_PID.c
 
-![rtc_control](images/rtc_control.svg)
+![fan_PID](images/fan_PID.svg)
 
 flowchart for rtc_control.c
+
+![rtc_control](images/rtc_control.svg)
+
+
 
 
 
