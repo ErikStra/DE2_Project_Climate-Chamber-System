@@ -35,6 +35,12 @@ Variables flowchart
 
 flowchart for fan_PID.c
 
+![rtc_control](images/rtc_control.svg)
+
+flowchart for rtc_control.c
+
+
+
 
 
 Put flowchats/state diagrams of your algorithm(s) and direct links to source/testbench files in src and sim folders.
