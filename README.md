@@ -39,6 +39,12 @@ flowchart for rtc_control.c
 
 ![rtc_control](images/rtc_control.svg)
 
+flowchart for main.c
+
+![rtc_control](images/main.svg)
+
+
+
 
 
 
