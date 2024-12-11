@@ -114,8 +114,7 @@ This project implements a dual-fan control system using PID (Proportional-Integr
 
 ## **Potential Enhancements**
 1. Add humidity-based fan control for improved environmental regulation.
-2. Implement dynamic PID parameter tuning via UART for easier calibration.
-3. Include logging for debugging and performance monitoring.
+
 
 ---
 
