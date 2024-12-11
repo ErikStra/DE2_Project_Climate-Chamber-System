@@ -75,10 +75,10 @@ void rtc_control_loop(void) {
 void rtc_set_time(uint8_t hours, uint8_t minutes, uint8_t secs) {
     twi_start();
     twi_write((RTC_ADR << 1) | TWI_WRITE);
-    twi_write(RTC_SEC_MEM);
-    twi_write(bcdToDec(secs));
-    twi_write(bcdToDec(minutes));
-    twi_write(bcdToDec(hours));
+    twi_write(RTC_SEC_MEM);                 //možná radši použít decToBcd než bcdToDec (vyzkoušet)
+    twi_write(decToBcd(secs));
+    twi_write(decToBcd(minutes));
+    twi_write(decToBcd(hours));
     twi_stop();
 }
 
