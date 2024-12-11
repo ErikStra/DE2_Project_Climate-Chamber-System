@@ -478,7 +478,7 @@ void processCommand(char *command) {
                 
                 uart_puts("\r\n       enter parameters as int numbers searated by semicoln\n");
                 //uart_puts("       set(MaxT1*10 MaxT2*10 MaxH1 MinH2 SR SS water_time autowater autolight control water_delay drying_speed KP1*10 KI1*10 KD1*10 KP2*10 KI2*10 KD2*10) \n");
-                uart_puts("       set(MaxT1*10 MaxT2*10 MaxH1 MinH2 SR SS water_time KP1*10 KI1*10 KD1*10) \n");
+                uart_puts("       upload(MaxT1*10 MaxT2*10 MaxH1 MinH2 SR SS water_time KP1*10 KI1*10 KD1*10) \n");
         
         /* code */
         }   
