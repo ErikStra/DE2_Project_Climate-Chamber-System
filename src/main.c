@@ -70,9 +70,9 @@ int main(void){
     UserInterface_init();
     rtc_control_init();
     fan_PID_init();
-    outputControl_init();
-    //bmp280_init();
     
+    bmp280_init();
+    outputControl_init();
     
 
 
@@ -136,9 +136,9 @@ while (1) { // Nekonečná smyčka
         bmp280_measure();
         TEMP2 = bmp280_gettemperature();
         PRESSURE = bmp280_getpressure();
-        char buffer[3];
+        /* char buffer[3];
         itoa((TEMP2), buffer, 10);
-        uart_puts(buffer);
+        uart_puts(buffer); */
         flag_bmp280_update_temp_press = 0;
       }
   }
@@ -166,7 +166,7 @@ ISR(TIMER2_OVF_vect){
     if (n_ovfs % 63 == 0){ //cca každou 1s
       flag_outputControl = 1;
       flag_dht_update_temp1 = 1;
-      //flag_bmp280_update_temp_press = 1;
+      flag_bmp280_update_temp_press = 1;
       
     }
 

@@ -35,11 +35,11 @@ uint16_t water_delay = 1;
 uint8_t drying_speed = 179; // speed of FAN 1 when humidity of air crosses upper limit
 
 // PID konstanty
-double KP1 = 10.0;  // Proporční konstanta
-double KI1 = 0.0;  // Integrální konstanta
-double KD1 = 0.0;  // Derivační konstanta
+double KP1 = 30.0;  // Proporční konstanta
+double KI1 = 2.5;  // Integrální konstanta
+double KD1 = 0.1;  // Derivační konstanta
 
-double KP2 = 2.0;  // Proporční konstanta
+double KP2 = 10.0;  // Proporční konstanta
 double KI2 = 0.5;  // Integrální konstanta
-double KD2 = 1.0;  // Derivační konstanta
+double KD2 = 0.1;  // Derivační konstanta
 

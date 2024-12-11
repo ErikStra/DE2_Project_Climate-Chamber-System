@@ -60,12 +60,12 @@ void LCD_DrawScreen2() {
 
             break;
         case 1: // Max Temperature (TEMP1)
-            snprintf(buffer, 14, "Max Temp.");
-            snprintf(buffer2, 6, "%d%cC    ", max_temp1, 223);
+            snprintf(buffer, 14, "Max Temp.        ");
+            snprintf(buffer2, 6, "%d.%d%cC    ", max_temp1/10, max_temp1%10, 223);
             break;
         case 2: // Max LED temperature (TEMP2)
-            snprintf(buffer, 14, "Max LED temp.");
-            snprintf(buffer2, 6, "%d%cC    ", max_temp2, 223);
+            snprintf(buffer, 14, "Max LED temp.   ");
+            snprintf(buffer2, 6, "%d.%d%cC    ", max_temp2/10, max_temp2%10, 223);
             break;
         case 3: // Max AirHum
             snprintf(buffer, 14, "Max Air Hum. ");
@@ -293,10 +293,10 @@ void HandleInput(char input) {
                 case 0:
                     break;
                 case 1: // Max Temp
-                    if (max_temp1 < 50) {
+                    if (max_temp1 < 500) {
                         max_temp1++;} break;
                 case 2: // Min Temp
-                    if (max_temp2 < 50) {
+                    if (max_temp2 < 500) {
                         max_temp2++; } break;
                 case 3: // Max airhum
                     if (max_airhum < 100) {
@@ -449,17 +449,17 @@ void processCommand(char *command) {
                 max_temp2 = num[1];
                 max_airhum = num[2];
                 min_soilhum = num[3];
-                sunset = num[4];
-                sunrise = num[5];
+                sunrise = num[4];
+                sunset = num[5];
                 water_time = num[6];
                 // autowater = num[7];
                 // autolight = num[8];
                 // control = num[9];
                 // water_delay = num[10];
                 // drying_speed = num[11];
-                KP1 = num[7];
-                KI1 = num[8];
-                KD1 = num[9];
+                KP1 = num[7]/10.0;
+                KI1 = num[8]/10.0;
+                KD1 = num[9]/10.0;
                 // KP2 = num[15];
                 // KI2 = num[16];
                 // KD2 = num[17];
@@ -493,8 +493,8 @@ void processCommand(char *command) {
             snprintf(buffer, sizeof(buffer), "%d.%d;%d.%d;%d.%d;%d.%d;%d;%d;%d;%d;%d;%d;%d", TEMP1/10, TEMP1 %10, TEMP2/100, TEMP2%100, HUM1/10, HUM1%10, HUM2/10, HUM2%10, LED, fan_big, fan_led, wlevel, hours, minutes, secs);
             uart_puts(buffer);
             uart_puts("\n\r");
-            snprintf(buffer, 100, "%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d", max_temp1, max_temp2, max_airhum, min_soilhum, sunrise, sunset, water_time, autowater, autolight, control,  water_delay, drying_speed, KP1, KI1, KD1, KP2, KI2, KD2);
-            uart_puts(buffer);
+            /* snprintf(buffer, 100, "%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d", max_temp1, max_temp2, max_airhum, min_soilhum, sunrise, sunset, water_time, autowater, autolight, control,  water_delay, drying_speed, KP1, KI1, KD1, KP2, KI2, KD2);
+            uart_puts(buffer); */
     }       
     else {
         uart_puts("\r\n[ERROR] Unknown command\n");
