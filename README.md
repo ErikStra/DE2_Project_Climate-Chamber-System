@@ -78,11 +78,11 @@ Variables flowchart
 
 ![flowchart_diagram](images/DE_2_diagram.svg)
 
-flowchart for fan_PID.c
+flowchart for [fan_PID.c](lib/fan_PID.c)
 
 ![fan_PID](images/fan_PID.svg)
 
-flowchart for rtc_control.c
+flowchart for [rtc_control.c](lib/rtc_control.c)
 
 ![rtc_control](images/rtc_control.svg)
 
