@@ -80,13 +80,13 @@ Variables flowchart
 
 flowchart for [fan_PID.c](lib/fan_PID.c)
 
-![fan_PID](images/fan_PID.svg)
+![fan_PID](images/fan_PID.svg)[fan_PID README](lib/fan_senzor/fan_PID.md)
 
 flowchart for [rtc_control.c](lib/rtc_control.c)
 
-![rtc_control](images/rtc_control.svg)
+![rtc_control](images/rtc_control.svg)[rtc_control README](lib/RTC/rtc_control.md)
 
-flowchart for [main.c](src/main.c)
+flowchart for [main.c](src/main.c)[main README](src/main.md)
 
 ![rtc_control](images/main.svg)
 
