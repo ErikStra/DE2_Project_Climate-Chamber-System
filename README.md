@@ -75,6 +75,7 @@ settings variables can be uploaded via upload command in format upload(MaxT1*10 
   - **rtc_control.c**: Manages time-based operations and schedules.
   - **outputControl.c**: Controls GPIO outputs, including lights and pumps.
   - **variables.c**: Stores shared variables between different modules.
+ 
 
 - For efficient task management, we used flags and timers to organize and prioritize operations.
 
@@ -93,15 +94,6 @@ flowchart for [rtc_control.c](lib/rtc_control.c)   [rtc_control README](lib/RTC/
 flowchart for [main.c](src/main.c)    [main README](src/main.md)
 
 ![rtc_control](images/main.svg)
-
-
-
-
-
-
-
-
-
 
 ## Instructions
 ###Screens
