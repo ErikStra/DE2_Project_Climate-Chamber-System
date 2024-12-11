@@ -78,15 +78,15 @@ Variables flowchart
 
 ![flowchart_diagram](images/DE_2_diagram.svg)
 
-flowchart for fan_PID.c
+flowchart for [fan_PID.c](lib/fan_senzor/fan_PID.c)    [fan_PID README](lib/fan_senzor/fan_PID.md)
 
 ![fan_PID](images/fan_PID.svg)
 
-flowchart for rtc_control.c
+flowchart for [rtc_control.c](lib/RTC/rtc_control.c)   [rtc_control README](lib/RTC/rtc_control.md)
 
 ![rtc_control](images/rtc_control.svg)
 
-flowchart for main.c
+flowchart for [main.c](src/main.c)    [main README](src/main.md)
 
 ![rtc_control](images/main.svg)
 
@@ -98,7 +98,7 @@ flowchart for main.c
 
 
 
-Put flowchats/state diagrams of your algorithm(s) and direct links to source/testbench files in src and sim folders.
+
 
 ## Component(s) simulation
 
@@ -107,6 +107,10 @@ Write descriptive text and put simulation screenshots of your components.
 ## Instructions
 
 Write an instruction manual for your application, including photos and a link to a short app video.
+
+## Testing and development
+
+
 
 ## References
 1. [ADC from GitHub of Tomas Fryza](https://github.com/tomas-fryza/avr-course/tree/master/archive/labx-adc)
