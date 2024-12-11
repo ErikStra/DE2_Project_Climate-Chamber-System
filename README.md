@@ -86,7 +86,7 @@ flowchart for rtc_control.c
 
 ![rtc_control](images/rtc_control.svg)
 
-flowchart for main.c
+flowchart for [main.c](src/main.c)
 
 ![rtc_control](images/main.svg)
 
@@ -98,7 +98,7 @@ flowchart for main.c
 
 
 
-Put flowchats/state diagrams of your algorithm(s) and direct links to source/testbench files in src and sim folders.
+
 
 ## Component(s) simulation
 
