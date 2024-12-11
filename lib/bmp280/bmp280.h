@@ -1,7 +1,7 @@
 #ifndef BMP280_H_
 #define BMP280_H_
 
-int8_t bmp280_init(void);		// call this first
+uint8_t bmp280_init(void);		// call this first
 uint8_t bmp280_get_status(void);	// read the status register
 void bmp280_set_config(uint8_t t_sb, uint8_t filter, uint8_t spi3w_en);
 	// set the configuration register

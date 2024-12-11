@@ -36,6 +36,12 @@ uint8_t selected_setting = 0;
 volatile uint8_t flag_update_lcd = 0;
 volatile uint8_t flag_tick = 0;
 
+//UART
+uint8_t awaiting_input = 0;
+size_t getcommand_buffer_index = 0;  
+char getcommand_buffer[75] = {0}; // Buffer pro příjem dat
+uint8_t input_complete = 0;
+
 
 // -- Funkce pro vykreslování ---------------------------------------
 void LCD_DrawScreen2() {
@@ -207,7 +213,7 @@ void LCD_DrawScreen5() { //obrazovka se statistikami osvětlení
 
     // Řádek 1
     HD44780_PCF8574_PositionXY(addr, 0, 0);
-    snprintf(buffer, 17, "LED:%3s %d.%d%cC",ONOFF_options[LED], TEMP2/100, TEMP2%100, 223);
+    snprintf(buffer, 17, "LED:%3s %d.%dC",ONOFF_options[LED], TEMP2/100, TEMP2%100);
     HD44780_PCF8574_DrawString(addr, buffer);
 
     uint8_t buffer2 = 0;
@@ -376,7 +382,7 @@ void UserInterface_display_loop (uint16_t n_ovfs){
             {
                 flag_tick = 0;
             }
-            /* if (n_ovfs == 240)
+            if (n_ovfs == 240)       // automatické přepínání obrazovek
             {
                 if (current_screen < 3)
                 {
@@ -386,7 +392,7 @@ void UserInterface_display_loop (uint16_t n_ovfs){
                 {
                     current_screen = 0;
                 }
-            } */
+            }
         
 
         // Aktualizace displeje
@@ -411,99 +417,92 @@ void UserInterface_display_loop (uint16_t n_ovfs){
                     
     }
 
-void int_to_string(int16_t input, char *output) {
+void int_to_string(int16_t input, char *output) { //converts int temperature in format 223 to 22.3, asi se na ni vybodnu, je celkem na prd
 sprintf(output, "%d.%d", input/ 10, input % 10);
 }
 
 void processCommand(char *command) {
-    char buffer[50];
-    if (strcmp(command, "upload settings") >= 0) {
+    char buffer[75];
+    remove_trailing_newline(command);
+    
+    if (strcmp(command, "upload") >= 0) {
         cleanString(command);
-        if (countSemicolons(command) == 9){
-
-
+        if (count(';', command) == 9){
         char *token;
         int16_t num[9];
-
         // Get the first token (before the first comma)
         token = strtok(command, ";");
-        
+        uart_puts("\n\r");
         uint8_t i = 0;
         while (token != NULL) {// Loop through the string to get all tokens
             // Convert the token to an integer
             num[i] = atoi(token);
             
             // Print the integer (or you can store it in an array if needed)
-            snprintf(buffer, 5, "%2d", num[i]);
+            snprintf(buffer, 15, "Value %d : %2d", i, num[i]);
             uart_puts(buffer); uart_puts("\n\r");
-
             // Get the next token
             token = strtok(NULL, ";");
             i++;
-        }
-            max_temp1 = num[0];
-            max_temp2 = num[1];
-            max_airhum = num[2];
-            min_soilhum = num[3];
-            sunrise = num[4];
-            sunset = num[5];
-            water_time = num[6];
-            control = num[7];
-            autolight = num[8];
-            autowater = num[9];
+            }
+                max_temp1 = num[0];
+                max_temp2 = num[1];
+                max_airhum = num[2];
+                min_soilhum = num[3];
+                sunset = num[4];
+                sunrise = num[5];
+                water_time = num[6];
+                // autowater = num[7];
+                // autolight = num[8];
+                // control = num[9];
+                // water_delay = num[10];
+                // drying_speed = num[11];
+                KP1 = num[7];
+                KI1 = num[8];
+                KD1 = num[9];
+                // KP2 = num[15];
+                // KI2 = num[16];
+                // KD2 = num[17];
 
 
-            /*snprintf(buffer, 100, "%d;%d;%d;%d;%d;%d;%d;%d;%d;%d", max_temp1, max_temp2, max_airhum, min_soilhum, sunrise, sunset, water_time, control, autolight, autowater);
-            uart_puts(buffer); */
+            snprintf(buffer, 100, "%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d", max_temp1, max_temp2, max_airhum, min_soilhum, sunrise, sunset, water_time, autowater, autolight, control,  water_delay, drying_speed, KP1*10, KI1*10, KD1*10, KP2*10, KI2*10, KD2*10);
+            uart_puts(buffer); 
             uart_puts("\r\n[INFO] Settings saved\n");
         } else{
-            uart_puts("[ERROR] Wrong format. Insert settings in format: \r\n upload settings MaxT1; MaxT2; MaxH1; MinH2; sunrise; sunset; water time; control; autolight; autowater\r\n");
-        }
-    } else if (strcmp(command, "stats") == 0) {
-            snprintf(buffer, 50, "%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d", TEMP1, TEMP2, HUM1, HUM2, LED, fan_big, fan_led, pump, wlevel, hours, minutes, secs);
-            uart_puts(buffer);  
-    } else if (strcmp(command, "upload PID") >= 0){
-        cleanString(command);
-        if (countSemicolons(command) == 5){
-
-
-        char *token;
-        int16_t num[5];
-
-        // Get the first token (before the first comma)
-        token = strtok(command, ";");
+                if (count(';', command) > 5)
+                {
+                    uart_puts("[ERROR] too many arguments.\r\n");
+                } else{
+                    uart_puts("[ERROR] not enough arguments.\r\n");
+                }
+                
+                uart_puts("\r\n       enter parameters as int numbers searated by semicoln\n");
+                //uart_puts("       set(MaxT1*10 MaxT2*10 MaxH1 MinH2 SR SS water_time autowater autolight control water_delay drying_speed KP1*10 KI1*10 KD1*10 KP2*10 KI2*10 KD2*10) \n");
+                uart_puts("       set(MaxT1*10 MaxT2*10 MaxH1 MinH2 SR SS water_time KP1*10 KI1*10 KD1*10) \n");
         
-        uint8_t i = 0;
-        while (token != NULL) {// Loop through the string to get all tokens
-            // Convert the token to an integer
-            num[i] = atoi(token);
-            
-            // Print the integer (or you can store it in an array if needed)
-            snprintf(buffer, 5, "%2d", num[i]);
-            uart_puts(buffer); uart_puts("\n\r");
-
-            // Get the next token
-            token = strtok(NULL, ";");
-            i++;
-        }
-            KP1 = num[0]/10;
-            KI1 = num[1]/10;
-            KD1= num[2]/10;
-            KP2 = num[3]/10;
-            KI2 = num[4]/10;
-            KD2 = num[5]/10;
-
-
-            /*snprintf(buffer, 100, "%d;%d;%d;%d;%d;%d;%d;%d;%d;%d", max_temp1, max_temp2, max_airhum, min_soilhum, sunrise, sunset, water_time, control, autolight, autowater);
-            uart_puts(buffer); */
-            uart_puts("\r\n[INFO] PID Settings saved\n");
-        } else{
-                uart_puts("[ERROR] Wrong format. Insert settings in format: \r\n upload PID KP1; KI1; KD1; KP2; KI2; KD2\r\n");
         /* code */
-        }             
-    } else {
+        }   
+
+                       
+        memset(getcommand_buffer, '\0', sizeof(buffer)); // Vymaž buffer
+        getcommand_buffer_index = 0;
+    }
+    
+    else if (strcmp(command, "stats") >= 0) {
+            uart_puts("\n\r");
+            snprintf(buffer, sizeof(buffer), "%d.%d;%d.%d;%d.%d;%d.%d;%d;%d;%d;%d;%d;%d;%d", TEMP1/10, TEMP1 %10, TEMP2/100, TEMP2%100, HUM1/10, HUM1%10, HUM2/10, HUM2%10, LED, fan_big, fan_led, wlevel, hours, minutes, secs);
+            uart_puts(buffer);
+            uart_puts("\n\r");
+            snprintf(buffer, 100, "%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d", max_temp1, max_temp2, max_airhum, min_soilhum, sunrise, sunset, water_time, autowater, autolight, control,  water_delay, drying_speed, KP1, KI1, KD1, KP2, KI2, KD2);
+            uart_puts(buffer);
+    }       
+    else {
         uart_puts("\r\n[ERROR] Unknown command\n");
     } 
+
+    memset(buffer, '\0', sizeof(buffer)); // Vymažeme buffer
+
+
 }
 
 void remove_trailing_newline(char *str) {
@@ -512,11 +511,17 @@ void remove_trailing_newline(char *str) {
     if ((pos = strchr(str, '\r')) != NULL) *pos = '\0';
 }
 
-char buffer[50] = {0}; // Buffer pro příjem dat
-size_t buffer_index = 0;
 
-void uart_getcommand(){
+
+
+int uart_getcommand(char *output){
+    
+     
+
     unsigned int received = uart_getc();
+    if (output != NULL) {
+        
+    }
     // Zpracování, pokud přijde platný znak
     if (!(received & UART_NO_DATA)) {
         char c = (char)received;
@@ -524,32 +529,27 @@ void uart_getcommand(){
         // Echo znaku zpět na UART
         uart_putc(c);
 
-        // Pokud je Enter (detekujeme '\n' nebo '\r')
-        if (c == '\n' || c == '\r') {
-            // Zkontrolujeme, jestli buffer není prázdný
-            if (buffer_index > 0) {
-                buffer[buffer_index] = '\0'; // Ukončíme řetězec
-                uart_puts("\r");   // Přidáme nový řádek pro čitelnost
-                uart_puts("received command: ");
-                uart_puts(buffer);   // Vypíšeme obsah bufferu pro debug
-                uart_puts("\r\n");   // Další nový řádek
-                processCommand(buffer);
-
-                // Zpracujeme příkaz
+        if (c == '\n' || c == '\r') { // když stisknut Enter
+            if (getcommand_buffer_index > 0) { //jestli buffer není prázdný
+                getcommand_buffer[getcommand_buffer_index] = '\0';
+                uart_puts("\r");   
+                uart_puts("received : ");
+                uart_puts(getcommand_buffer);   // Vypíšeme obsah bufferu pro debug
+                uart_puts("\r\n"); 
+                processCommand(getcommand_buffer);
                 
-
                 // Reset bufferu a buffer_indexu
-                memset(buffer, '\0', sizeof(buffer)); // Vymažeme buffer
-                buffer_index = 0;
+                memset(getcommand_buffer, '\0', sizeof(getcommand_buffer)); // Vymažeme buffer
+                getcommand_buffer_index = 0;
             }
         } else {
             // Přidáme znak do bufferu, pokud není buffer plný
-            if (buffer_index < sizeof(buffer) - 1) {
-                buffer[buffer_index++] = c;
+            if (getcommand_buffer_index < sizeof(getcommand_buffer) - 1) {
+                getcommand_buffer[getcommand_buffer_index++] = c;
             } else {
                 uart_puts("\r\n[ERROR] Buffer overflow, resetting...\r\n");
-                memset(buffer, '\0', sizeof(buffer)); // Vymažeme buffer
-                buffer_index = 0;
+                memset(getcommand_buffer, '\0', sizeof(getcommand_buffer)); // Vymažeme buffer
+                getcommand_buffer_index = 0;
             }
         }
     }
@@ -569,10 +569,10 @@ void cleanString(char *input) {
     input[j] = '\0';
 }
 
-int countSemicolons(const char *str) {
+int count(char character, char *str) {
     int count = 0;
     while (*str) {
-        if (*str == ';') {
+        if (*str == character) {
             count++;
         }
         str++;

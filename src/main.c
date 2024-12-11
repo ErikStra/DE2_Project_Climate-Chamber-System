@@ -26,6 +26,7 @@
 #include "UserInterface.h"  // UI a ovládání
 #include "fan_PID.h"        // Ovládání ventilátorů
 #include "outputControl.h"  // Ovládání GPIO pinů
+#include "bmp280.h"         //bmp280 knihovna
 
 
 
@@ -37,12 +38,13 @@
  * @return int
  */
 
-volatile uint8_t flag_UI_input_loop = 0;
+volatile uint8_t flag_UI_getcommand = 0;
 volatile uint8_t flag_UI_display_loop = 0;
 volatile uint8_t flag_fan_PID = 0;
 volatile uint8_t flag_RTC = 0;
 volatile uint8_t flag_outputControl = 0;
 volatile uint8_t flag_dht_update_temp1 = 0;
+volatile uint8_t flag_bmp280_update_temp_press = 0;
 
 uint16_t n_ovfs = 0;
 uint16_t previous_n_ovfs = 0;
@@ -69,19 +71,22 @@ int main(void){
     rtc_control_init();
     fan_PID_init();
     outputControl_init();
+    //bmp280_init();
+    
     
 
 
 while (1) { // Nekonečná smyčka
-    if(flag_UI_input_loop){
-      uart_getcommand();
+    if(flag_UI_getcommand){
+      uart_getcommand(NULL);
       
       //UserInterface_input_loop();
-      flag_UI_input_loop=0;
+      flag_UI_getcommand=0;
     }
 
     if(flag_UI_display_loop){
       UserInterface_display_loop(previous_n_ovfs);
+      
       flag_UI_display_loop=0;
     }
   
@@ -118,14 +123,24 @@ while (1) { // Nekonečná smyčka
           uart_puts(buffer);
           uart_puts(" times in a row\r\n");
           IDK = IDK*5;
-        }
-        
+        }        
       } else {
         DHT_error_count =0;
         IDK = 5;
       }
       flag_dht_update_temp1 = 0;
     }
+
+    if(flag_bmp280_update_temp_press)
+      {
+        bmp280_measure();
+        TEMP2 = bmp280_gettemperature();
+        PRESSURE = bmp280_getpressure();
+        char buffer[3];
+        itoa((TEMP2), buffer, 10);
+        uart_puts(buffer);
+        flag_bmp280_update_temp_press = 0;
+      }
   }
   // EXIT
   // ------------------------------------------------- 
@@ -135,7 +150,7 @@ while (1) { // Nekonečná smyčka
 
 ISR(TIMER2_OVF_vect){
     if (n_ovfs % 10 == 0){ //cca každých 130 ms
-      flag_UI_input_loop=1;
+      flag_UI_getcommand=1;
     }
 
     if (n_ovfs % 15 == 0){ //cca každých 200 ms
@@ -151,10 +166,11 @@ ISR(TIMER2_OVF_vect){
     if (n_ovfs % 63 == 0){ //cca každou 1s
       flag_outputControl = 1;
       flag_dht_update_temp1 = 1;
+      //flag_bmp280_update_temp_press = 1;
+      
     }
 
     if (n_ovfs % 250 == 0){ //cca každé 4s
-      
     }
     
     n_ovfs++;

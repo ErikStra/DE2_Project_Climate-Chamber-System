@@ -2,7 +2,7 @@
 
 
 // Proměnné z čidel
-int16_t TEMP1 = 0;      
+int16_t TEMP1 = 0;
 int16_t HUM1 = 0;     
 int16_t HUM2 = 0;      
 uint8_t hours = 0;    
@@ -32,6 +32,7 @@ int8_t autowater = 1;
 int8_t autolight = 1;           
 int8_t chartest = 0;
 uint16_t water_delay = 1;
+uint8_t drying_speed = 179; // speed of FAN 1 when humidity of air crosses upper limit
 
 // PID konstanty
 double KP1 = 10.0;  // Proporční konstanta
@@ -42,4 +43,3 @@ double KP2 = 2.0;  // Proporční konstanta
 double KI2 = 0.5;  // Integrální konstanta
 double KD2 = 1.0;  // Derivační konstanta
 
-uint8_t drying_speed = 179; // speed of FAN 1 when humidity of air crosses upper limit

@@ -35,7 +35,7 @@
   void int_to_string(int16_t input, char *output);
   void processCommand(char *command);
   void remove_trailing_newline(char *str);
-  void uart_getcommand();
+  int uart_getcommand(char *output);
   void cleanString(char *input);
-  int countSemicolons(const char *str);
+  int count(char character, char *str);
 #endif
