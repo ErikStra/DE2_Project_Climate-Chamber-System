@@ -6,16 +6,16 @@
 
 ## Team members
 
-- **Vít Vašenka**
+- **Vít Vašenka** Responsible for RTC, LED and pump control
 
 
-- **Jindřich Zobač**
+- **Jindřich Zobač** responsible for UI, main.c, UART communication
 
 
-- **Erik Straka**
+- **Erik Straka** responsible for sensors readings
 
 
-- **Artem Kostenko**
+- **Artem Kostenko** responsible for fan control, Readme.md
 
 
 ## Theoretical description and explanation
@@ -36,6 +36,8 @@ The goal is to build an automated system that:
 
 ## Hardware description of demo application
 
+## 0. Block diagram of the whole setup
+![Block diagram](images/schema.jpg)
 
 ## 1. Sensors for Monitoring
 - **DHT Sensor**: Measures temperature and humidity to monitor the environment.
@@ -47,9 +49,16 @@ The goal is to build an automated system that:
 - **Lights**: Provide artificial lighting for photosynthesis.
 - **Water Pump**: Irrigates the soil automatically when moisture levels are low.
 
-## 3. User Interface
+## 3. User Interface and communication with PC
 - **LCD Display**: Displays the current environmental conditions to the user.
 - **UART Communication**: Allows users to adjust settings via a terminal interface.
+![inicialization after starup](images/screen_init.png)
+
+stats command yelds string in csv-like format of current values of modules variables in format TEMP1;TEMP2;HUM1;HUM2;LED;fan_big;fan_led;wlevel;hours;minutes;secs
+![stats command](images/screen_stats.png)
+
+settings variables can be uploaded via upload command in format upload(MaxT1*10 MaxT2*10 MaxH1 MinH2 SR SS water_time KP1*10 KI1*10 KD1*10)
+![upload command](images/screen_upload.png)
 
 ## 4. Control Logic
 - **PID Control**: We implemented precise fan operation using PID control logic.
@@ -58,11 +67,6 @@ The goal is to build an automated system that:
 
 ## 5. Microcontroller
 - We used an **Arduino Nano (ATmega328P)** to interface with all sensors and control actuators.
-
-
-
-
-
 
 
 ## Software description
@@ -78,11 +82,11 @@ Variables flowchart
 
 ![flowchart_diagram](images/DE_2_diagram.svg)
 
-flowchart for [fan_PID.c](lib/fan_senzor/fan_PID.c)    [fan_PID README](lib/fan_senzor/fan_PID.md)
+flowchart for [fan_PID.c](lib/fan_PID.c)    [fan_PID README](lib/fan_senzor/fan_PID.md)
 
 ![fan_PID](images/fan_PID.svg)
 
-flowchart for [rtc_control.c](lib/RTC/rtc_control.c)   [rtc_control README](lib/RTC/rtc_control.md)
+flowchart for [rtc_control.c](lib/rtc_control.c)   [rtc_control README](lib/RTC/rtc_control.md)
 
 ![rtc_control](images/rtc_control.svg)
 
@@ -99,18 +103,27 @@ flowchart for [main.c](src/main.c)    [main README](src/main.md)
 
 
 
-
-## Component(s) simulation
-
-Write descriptive text and put simulation screenshots of your components.
-
 ## Instructions
+###Screens
+- 1: displays temp. of air, humidity of air and humidity of soil, time
+- 2: informayion regarding LED light
+- 3: information about state of fans
+- 4: information about water level, pump and time of autowatering
+- 5: Screen to adjust system variables like max. temp, max. humidity etc.
 
-Write an instruction manual for your application, including photos and a link to a short app video.
+- Control: connect NANO to PC and inicialize UART communication.
+- loop trough screens 1-5 by pressing b key
+- on screen 5 (settings)
+
+![box](images/box.jpg)
+![roof](images/roof.jpg)
+![mainboard](images/mainboard.jpg)
+![homescreen](images/homescreen.jpg)
+
 
 ## Testing and development
 
-
+![rtc_control](images/main.svg)
 
 ## References
 1. [ADC from GitHub of Tomas Fryza](https://github.com/tomas-fryza/avr-course/tree/master/archive/labx-adc)
