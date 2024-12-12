@@ -6,19 +6,19 @@
  * @email       238545@vutbr.cz
  * @author      Artem Kostenko
  * @datum       25.11.2024
- * @file        fan_PID.h
+ * @file        fan_PID.c
  * @version     3.0
  * @tested      Arduino nano Atmega 328p
  * ---------------------------------------------------+
  */
-#include <avr/io.h>
-#include <avr/interrupt.h>
-#include <stdio.h>
-#include <string.h> // For memset
-#include "uart.h"
-#include "pwm.h"
-#include "variables.h"
-#include "fan_PID.h"
+#include <avr/io.h>          //AVR device-specific IO definitions
+#include <avr/interrupt.h>   //Interrupts standart C library for AVR-GCC
+#include <stdio.h>           // Standart library
+#include <string.h>          // For memset
+#include "uart.h"            //Peter Fleury's  UART library
+#include "pwm.h"             //Artem Kostenko's PWM libary
+#include "variables.h"       //globar variables
+#include "fan_PID.h"         
 
 #define F_CPU 16000000L
 
