@@ -1,7 +1,20 @@
+/** 
+ * ---------------------------------------------------+ 
+ * @desc        PWM library h
+ * ---------------------------------------------------+ 
+ * @copyright   Copyright (C) 2024 Artem Kostenko.
+ * @email       238545@vutbr.cz
+ * @author      Artem Kostenko
+ * @datum       25.11.2024
+ * @file        pwm.h
+ * @version     1.0
+ * @tested      Arduino nano Atmega 328p
+ * ---------------------------------------------------+
+ */
 #ifndef PWM_H
 #define PWM_H
 
-#include <avr/io.h>
+#include <avr/io.h> //AVR device-specific IO definitions
 
 // Pin definitions
 #define FAN1_PIN PD5  // Define the pin for Fan 1 (OC0B, Arduino Nano pin D5)
