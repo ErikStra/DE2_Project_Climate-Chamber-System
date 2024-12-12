@@ -1,64 +1,78 @@
+/** 
+ * ---------------------------------------------------+ 
+ * @desc        RTC library c
+ * ---------------------------------------------------+ 
+ * @copyright   Copyright (C) 2024 Vít Vašenka.
+ * @email       246961@vutbr.cz
+ * @author      Vít Vašenka
+ * @datum       12.12.2024
+ * @file        rtc_control.c
+ * @version     3.0
+ * @tested      Arduino nano Atmega 328p
+ * ---------------------------------------------------+
+ */
 
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
-#include <avr/eeprom.h>  // Pro práci s EEPROM
-#include <stdlib.h>
-#include "../../include/timer.h"
-#include <twi.h>
-#include <uart.h>
-#include <rtc_control.h>
-#include <variables.h>
-#include <time.h>
+#include <avr/io.h>                 // AVR device-specific IO definitions
+#include <avr/interrupt.h>          // Interrupts standard C library for AVR-GCC
+#include <avr/eeprom.h>             // Pro práci s EEPROM
+#include <stdlib.h>                 // C library. Needed for number conversions
+#include "../../include/timer.h"    // Timer library for AVR-GCC
+#include <twi.h>                    // I2C knihovna Tomáše Fryzy
+#include <uart.h>                   // Peter Fleury's UART library
+#include <rtc_control.h>            // Header file
+#include <variables.h>              // Global variables 
 
-#define RTC_ADR 0x68
+//RTC modul structure 
+#define RTC_ADR 0x68    //Adresa modulu na I2C sběrnici
+
+//Registers for seconds, minutes, hours
 #define RTC_SEC_MEM 0
 #define RTC_MIN_MEM 1
 #define RTC_HOUR_MEM 2
 
-/* EEPROM adresy */
+// EEPROM adress
 #define EEPROM_SUNRISE_HOURS_ADDR 0x00
 #define EEPROM_SUNRISE_MINUTES_ADDR 0x01
 #define EEPROM_SUNSET_HOURS_ADDR 0x02
 #define EEPROM_SUNSET_MINUTES_ADDR 0x03
 #define EEPROM_LIGHT_STATE_ADDR 0x04
 
-/* Struktura RTC */
 
-char string[3];
+char string[3];                         //Převod čísel na řetězce
 
-volatile uint8_t new_sensor_data = 0;
+volatile uint8_t new_sensor_data = 0;   //Indikace nových dat ze senzorů
 
 
-/* Proměnné pro časy východu a západu slunce */
+//Variables for sunrise and sunset 
 uint8_t sunrise_hours, sunrise_minutes;
 uint8_t sunset_hours, sunset_minutes;
 
-/* Funkční prototypy */
-uint8_t bcdToDec(uint8_t val);
-uint8_t decToBcd(uint8_t val);
-void rtc_read_time();
-uint8_t compare_time_with_sun(uint8_t currentHour, uint8_t sunrise, uint8_t sunset);
-void load_settings_from_eeprom();
-void save_settings_to_eeprom();
+uint8_t bcdToDec(uint8_t val);          //Převod z BCD na desítkové číslo
+uint8_t decToBcd(uint8_t val);          //Přeovd z desítkového čísla na BCD
+void rtc_read_time();                   //Čtení času z RTC
+uint8_t compare_time_with_sun(uint8_t currentHour, uint8_t sunrise, uint8_t sunset); //Porovnání času východu a západu slunce s aktuálním časem
+void load_settings_from_eeprom();       //Načtení stavu LED z EEPROM
+void save_settings_to_eeprom();         //Uložení stavu LED do EEPROM
 
+//RTC initialization
 void rtc_control_init(void) {
     
-    // Načtení časů východu a západu slunce z EEPROM
     load_settings_from_eeprom();
 
     rtc_initialize();
 
-    // Test RTC
+    //Test RTC
     if (twi_test_address(RTC_ADR) != 0) {
-        uart_puts("[ERROR] RTC not detected\r\n");
+        uart_puts("[ERROR] RTC not detected\r\n");  //Výpis chybové hlášky na uart
     }
 }
 
+//A loop to compare the current time with the sunrise and sunset time
 void rtc_control_loop(void) {
         compare_time_with_sun(hours, sunrise, sunset);         
             
-            /* // Výpis na UART
+            /* // Výpis na UART pro kontrolu času 
             itoa((hours), string, 10);
             uart_puts(string);
             uart_puts(":");
@@ -72,32 +86,32 @@ void rtc_control_loop(void) {
         
     }
 
+//Setting the RTC time using I2C
 void rtc_set_time(uint8_t hours, uint8_t minutes, uint8_t secs) {
     twi_start();
     twi_write((RTC_ADR << 1) | TWI_WRITE);
-    twi_write(RTC_SEC_MEM);                 //možná radši použít decToBcd než bcdToDec (vyzkoušet)
+    twi_write(RTC_SEC_MEM);                 
     twi_write(decToBcd(secs));
     twi_write(decToBcd(minutes));
     twi_write(decToBcd(hours));
     twi_stop();
 }
 
-// Funkce pro inicializaci RTC
+//RTC initialization function
  void rtc_initialize(void) {
-    // Čtení sekund z RTC pro kontrolu platnosti času
     twi_start();
     twi_write((RTC_ADR << 1) | TWI_WRITE);
-    twi_write(RTC_SEC_MEM);  // Nastavení na registr pro sekundy
+    twi_write(RTC_SEC_MEM); 
     twi_stop();
 
     twi_start();
     twi_write((RTC_ADR << 1) | TWI_READ);
-    uint8_t secs = twi_read(TWI_NACK);  // Čtení sekund
+    uint8_t secs = twi_read(TWI_NACK);  
     twi_stop(); 
 
-  if (1)//secs == 0 || secs == 0xFF || bcdToDec(secs) > 59)
+  if (1)
     {   
-        // Nastavení času z kompilace
+        // Sets time from compilation
         uint8_t hours = atoi(__TIME__);
         uint8_t minutes = atoi(__TIME__ + 3);
         uint8_t secs = atoi(__TIME__ + 6);
@@ -107,10 +121,12 @@ void rtc_set_time(uint8_t hours, uint8_t minutes, uint8_t secs) {
     } else {
         uart_puts("[INFO] RTC time is valid \r\n");
     }
-}
+} //Kontroluje, zda je RTC čas platný, a pokud ne, inicializuje ho na čas kompilace
 
 
 
+
+//Determines whether the lighting should be on, based on the time
 uint8_t compare_time_with_sun(uint8_t currentHour, uint8_t sunrise, uint8_t sunset) {
     
 
@@ -120,7 +136,8 @@ uint8_t compare_time_with_sun(uint8_t currentHour, uint8_t sunrise, uint8_t suns
         LED = (currentHour >= sunrise && currentHour < sunset);
     }
 
-   /*  itoa(sunrise, string, 10);
+   /*  //Výpis na uart pro kontrolu času východu a západu slunce
+    itoa(sunrise, string, 10);
     uart_puts(string);
     uart_puts("         ");
     itoa(sunset, string, 10);
@@ -138,7 +155,7 @@ uint8_t compare_time_with_sun(uint8_t currentHour, uint8_t sunrise, uint8_t suns
     return LED;
 }
 
-
+//Starts communication with the RTC and sets the register
 void rtc_read_time() {
     twi_start();
     twi_write((RTC_ADR << 1) | TWI_WRITE);
@@ -151,15 +168,17 @@ void rtc_read_time() {
     minutes = bcdToDec(twi_read(TWI_ACK));
     hours = bcdToDec(twi_read(TWI_NACK));
     twi_stop();
-}
+} // Funkce je určena pro průběžné čtení aktuálního času během běhu programu
 
+
+//Loads settings from EEPROM
 void load_settings_from_eeprom() {
     sunrise_hours = eeprom_read_byte((uint8_t*)EEPROM_SUNRISE_HOURS_ADDR);
     sunrise_minutes = eeprom_read_byte((uint8_t*)EEPROM_SUNRISE_MINUTES_ADDR);
     sunset_hours = eeprom_read_byte((uint8_t*)EEPROM_SUNSET_HOURS_ADDR);
     sunset_minutes = eeprom_read_byte((uint8_t*)EEPROM_SUNSET_MINUTES_ADDR);
 
-    // Pokud EEPROM obsahuje neplatné hodnoty, nastavíme výchozí
+    // Pokud EEPROM obsahuje neplatné hodnoty, potom nastaví výchozí hodnoty
     if (sunrise_hours == 0xFF || sunrise_minutes == 0xFF ||
         sunset_hours == 0xFF || sunset_minutes == 0xFF) {
         sunrise_hours = sunrise;  
@@ -170,6 +189,7 @@ void load_settings_from_eeprom() {
     }
 }
 
+//Stores sunrise and sunset time in EEPROM.
 void save_settings_to_eeprom() {
     eeprom_write_byte((uint8_t*)EEPROM_SUNRISE_HOURS_ADDR, sunrise_hours);
     eeprom_write_byte((uint8_t*)EEPROM_SUNRISE_MINUTES_ADDR, sunrise_minutes);
@@ -177,6 +197,7 @@ void save_settings_to_eeprom() {
     eeprom_write_byte((uint8_t*)EEPROM_SUNSET_MINUTES_ADDR, sunset_minutes);
 }
 
+//Converts numbers between BCD and decimal formats
 uint8_t bcdToDec(uint8_t val) {
     return (val / 16 * 10) + (val % 16);
 }
