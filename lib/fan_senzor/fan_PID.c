@@ -1,3 +1,16 @@
+/** 
+ * ---------------------------------------------------+ 
+ * @desc        PID library c
+ * ---------------------------------------------------+ 
+ * @copyright   Copyright (C) 2024 Artem Kostenko.
+ * @email       238545@vutbr.cz
+ * @author      Artem Kostenko
+ * @datum       25.11.2024
+ * @file        fan_PID.h
+ * @version     3.0
+ * @tested      Arduino nano Atmega 328p
+ * ---------------------------------------------------+
+ */
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stdio.h>
