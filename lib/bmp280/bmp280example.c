@@ -1,4 +1,6 @@
 /* 
+Example code for reading and sending data from BMP280 over UART
+*/
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/io.h>
@@ -9,6 +11,7 @@
 #include <avr/interrupt.h>  // Interrupts standard C library for AVR-GCC
 #include "bmp280.h"
 
+//Baud rate of UART communication
 #define UART_BAUD_RATE 9600
 
 int32_t temp;
@@ -40,10 +43,10 @@ int main(void) {
 	while(1) {
 		//uart_print("status", bmp280_get_status());
 		bmp280_measure();
-        temp = bmp280_gettemperature();
-        itoa((temp), string, 10);
+        	temp = bmp280_gettemperature();
+        	itoa((temp), string, 10);
 		//uart_print("temperature x 100", bmp280_gettemperature());
-        uart_puts(string);
+        	uart_puts(string);
 		//uart_print("pressure x 100   ", bmp280_getpressure());
 		//uart_print("altitude x 100   ", 100*bmp280_getaltitude());
 		uart_puts("\n");
@@ -52,5 +55,3 @@ int main(void) {
 
 	return 0;
 }
-
-*/

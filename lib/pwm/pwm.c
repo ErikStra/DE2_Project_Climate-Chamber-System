@@ -1,3 +1,16 @@
+/** 
+ * ---------------------------------------------------+ 
+ * @desc        PWM library c
+ * ---------------------------------------------------+ 
+ * @copyright   Copyright (C) 2024 Artem Kostenko.
+ * @email       238545@vutbr.cz
+ * @author      Artem Kostenko
+ * @datum       25.11.2024
+ * @file        pwm.c
+ * @version     1.0
+ * @tested      Arduino nano Atmega 328p
+ * ---------------------------------------------------+
+ */
 #include "pwm.h"
 
 void pwm_init(void) {

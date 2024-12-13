@@ -1,3 +1,20 @@
+/*
+ * Library for Bosch BMP280 pressure sensor for AVR MCUs in plain old C.
+ *
+ * This library uses the TWI library by doc. Ing. Tomáš Frýza, Ph.D..
+ *
+ * This library is rewritten to work with TWI library. 
+ *
+ * Original library used custom i2ch library written by Jan "Yenya" Kasprzak, https://www.fi.muni.cz/~kas/
+ * 
+ * The library is distributable under the terms of the GNU General
+ * Public License, version 2 only.
+ *
+ * Written by Jan "Erik Straka, student at FEKT VUT
+ *
+ * Configuration can be done by editing the top of the bmp280.c file.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,35 +24,46 @@
 #include "bmp280.h"
 #include "twi.h" // Include TWI library
 
-#define BMP280_ADDR 0x76 // Can be 0x77 or 0x76
+// Address of BMP280 sensor, can support (0x77) or (0x76)
+#define BMP280_ADDR 0x76
 
-#define BMP280_I2CINIT // Comment out if initialized elsewhere
+// Comment out if initialized elsewhere
+#define BMP280_I2CINIT 
 
 // Provide the debugging function for sending NAME=value pairs, if needed
 #ifndef BMP280_DEBUG
 #define BMP280_DEBUG(name, val) do { } while (0)
 #endif
 
+// ID register address (0xD0) contains a unique identifier for the BMP280 sensor (0x58).
 #define BMP280_ID_REG        0xD0
 #define BMP280_ID_VAL        0x58
 
+// Calibration data is stored in registers from 0x88 to 0xA1
 #define BMP280_CAL_REG_FIRST 0x88
 #define BMP280_CAL_REG_LAST  0xA1
 #define BMP280_CAL_DATA_SIZE (BMP280_CAL_REG_LAST + 1 - BMP280_CAL_REG_FIRST)
 
+
+// Other Registers: BMP280_STATUS_REG, BMP280_CONTROL_REG, BMP280_CONFIG_REG manage the operational state and configuration of the sensor
 #define BMP280_STATUS_REG    0xF3
 #define BMP280_CONTROL_REG   0xF4
 #define BMP280_CONFIG_REG    0xF5
 
+// Raw Data Registers: Pressure (0xF7) and temperature (0xFA) data are read as 20-bit values
 #define BMP280_PRES_REG      0xF7
 #define BMP280_TEMP_REG      0xFA
 #define BMP280_RAWDATA_BYTES 6 // 3 bytes pressure, 3 bytes temperature
+
+// Constants for altitude computation
+#define BMP280_SEA_LEVEL_PRESSURE 101325 // Pa
+#define BMP280_ALTITUDE_CONSTANT 0.0000225577
 
 // Global variables for simplicity
 int32_t _bmp280_temp;
 uint32_t _bmp280_pres;
 
-// Helper function to write a byte to a BMP280 register
+// This function writes a single byte to a specific register of the BMP280 sensor over the I2C interface
 static void bmp280_writemem(uint8_t reg, uint8_t value)
 {
     twi_start();
@@ -45,7 +73,7 @@ static void bmp280_writemem(uint8_t reg, uint8_t value)
     twi_stop();
 }
 
-// Helper function to read bytes from a BMP280 register
+// This function reads multiple bytes from a specific BMP280 register
 void bmp280_readmem(uint8_t reg, uint8_t buff[], uint8_t bytes)
 {
     uint8_t i = 0;
@@ -68,7 +96,7 @@ void bmp280_readmem(uint8_t reg, uint8_t buff[], uint8_t bytes)
     twi_stop();
 }
 
-// Calibration data structure
+// This union stores calibration coefficients (read from the BMP280) needed to convert raw sensor data into usable temperature and pressure values
 static union _bmp280_cal_union {
     uint8_t bytes[BMP280_CAL_DATA_SIZE];
     struct {
@@ -87,7 +115,7 @@ static union _bmp280_cal_union {
     };
 } bmp280_cal;
 
-// Read calibration registers
+// Reads all calibration registers into the bmp280_cal structure and prints debugging information for each coefficient. The calibration data is vital for compensating raw sensor data.
 static void bmp280_getcalibration(void)
 {
     memset(bmp280_cal.bytes, 0, sizeof(bmp280_cal));
@@ -107,7 +135,7 @@ static void bmp280_getcalibration(void)
     BMP280_DEBUG("P9", bmp280_cal.dig_p9);
 }
 
-// Initialize BMP280
+// Initializes the BMP280 sensor
 uint8_t bmp280_init(void)
 {
     uint8_t buffer[1];
@@ -139,7 +167,7 @@ uint8_t bmp280_get_status(void)
     return data[0];
 }
 
-// Set control register
+// Configures the control register
 void bmp280_set_ctrl(uint8_t osrs_t, uint8_t osrs_p, uint8_t mode)
 {
     bmp280_writemem(BMP280_CONTROL_REG,
@@ -149,7 +177,7 @@ void bmp280_set_ctrl(uint8_t osrs_t, uint8_t osrs_p, uint8_t mode)
     );
 }
 
-// Set configuration register
+// Configures the configuration register
 void bmp280_set_config(uint8_t t_sb, uint8_t filter, uint8_t spi3w_en)
 {
     bmp280_writemem(BMP280_CONFIG_REG,
@@ -165,7 +193,7 @@ void bmp280_set_config(uint8_t t_sb, uint8_t filter, uint8_t spi3w_en)
 	| ((int32_t)(b3) >> 4) \
 )
 
-// Measure temperature and pressure
+// The sensor provides raw temperature and pressure data as 20-bit values. These are read from contiguous registers.
 void bmp280_measure(void)
 {
     uint8_t data[BMP280_RAWDATA_BYTES];
@@ -179,17 +207,9 @@ void bmp280_measure(void)
     BMP280_DEBUG("temp_raw", temp_raw);
     BMP280_DEBUG("pres_raw", pres_raw);
 
-    // compute the temperature
-	var1 = ((((temp_raw >> 3) - ((int32_t)bmp280_cal.dig_t1 << 1)))
-		* ((int32_t)bmp280_cal.dig_t2)) >> 11;
-	var2 = (((((temp_raw >> 4) - ((int32_t)bmp280_cal.dig_t1))
-		* ((temp_raw >> 4) - ((int32_t)bmp280_cal.dig_t1))) >> 12)
-		* ((int32_t)bmp280_cal.dig_t3)) >> 14;
-	t_fine = var1 + var2;
-	_bmp280_temp = (t_fine * 5 + 128) >> 8;
-	BMP280_DEBUG("temperature x 100", _bmp280_temp);
-
-    // compute the temperature
+	// Compute the temperature
+	// Calculate fine temperature offset (t_fine)
+	// This intermediate variable is used for pressure compensation
 	var1 = ((((temp_raw >> 3) - ((int32_t)bmp280_cal.dig_t1 << 1)))
 		* ((int32_t)bmp280_cal.dig_t2)) >> 11;
 	var2 = (((((temp_raw >> 4) - ((int32_t)bmp280_cal.dig_t1))
@@ -220,7 +240,7 @@ void bmp280_measure(void)
 double bmp280_getaltitude()
 {
     double alt;
-	alt = (1 - pow(_bmp280_pres/(double)101325, 0.1903)) / 0.0000225577;
+	alt = (1 - pow(_bmp280_pres/(double)BMP280_SEA_LEVEL_PRESSURE, 0.1903)) / BMP280_ALTITUDE_CONSTANT;
 
 	BMP280_DEBUG("alt x 100", (long)(alt * 100));
 
