@@ -126,7 +126,7 @@ void rtc_set_time(uint8_t hours, uint8_t minutes, uint8_t secs) {
 
 
 
-//Determines whether the lighting should be on, based on the time
+//Determines whether the LED should be on, based on the time
 uint8_t compare_time_with_sun(uint8_t currentHour, uint8_t sunrise, uint8_t sunset) {
     
 
