@@ -4,7 +4,7 @@
  - The goal of the project would is to create a system that measures key environmental parameters (such as temperature, humidity, light levels, soil moisture) for tropical plants.
  - This system should also allow the user to control or adjust environmental conditions and visualize the data.
 
- - See [video](Projekt_DE2_v2_compressed.mp4) for quick introduction
+ - download [video](Projekt_DE2_v2_compressed.mp4) for quick introduction or see it [online](https://vutbr-my.sharepoint.com/:v:/g/personal/246975_vutbr_cz/EZBG8xMaKs9Mt1U4UbR38VkB0fj96phy9CW1poMam4rAzw?e=LGnf4O&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D)
 
 <figure style="text-align: center;">
     <img src="images/obr 1.jpg" alt="the thing" width="400">
