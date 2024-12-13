@@ -161,13 +161,13 @@ in future, display will have dedicated keyboard to alow control without PC conne
 
   4. : information about water level, pump and time of autowatering
 <figure style="text-align: center;">
-    <img src="images/Screen 3.png" alt="Screen 3" width="374">
+    <img src="images/Screen 4.png" alt="Screen 4" width="374">
     <figcaption>Screen 3</figcaption>
 </figure>
 
   5. : Screen to adjust system variables like max. temp, max. humidity etc.
 <figure style="text-align: center;">
-    <img src="images/Screen 4.png" alt="Screen 4" width="374">
+    <img src="images/Screen 5.png" alt="Screen 5" width="374">
     <figcaption>Screen 4</figcaption>
 </figure>
 
