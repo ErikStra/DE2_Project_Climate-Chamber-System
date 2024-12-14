@@ -1,7 +1,7 @@
 # BPC/DE2_Project_Climate_Chamber_System
 
 ## Abstract
- - The goal of the project would is to create a system that measures key environmental parameters (such as temperature, humidity, light levels, soil moisture) for tropical plants.
+ - The goal of the project is to create a system that measures key environmental parameters (such as temperature, humidity, light levels, soil moisture) for tropical plants.
  - This system should also allow the user to control or adjust environmental conditions and visualize the data.
 
  - download [video](Projekt_DE2_v2_compressed.mp4) for quick introduction or see it [online](https://vutbr-my.sharepoint.com/:v:/g/personal/246975_vutbr_cz/EZBG8xMaKs9Mt1U4UbR38VkB0fj96phy9CW1poMam4rAzw?e=LGnf4O&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D)
@@ -40,11 +40,12 @@ Future upgrades will include features like automatic irrigation based on soil mo
 
 
 ## Hardware description of demo application
-Every great project starts on the planning board. The folowing diagram shows peripherals connected to the Arduino nano, both already implemented as we created it prior to actual hardware implementation.
+Every great project starts on the planning board. The following diagram shows peripherals connected to the Arduino nano, both already implemented as we created it prior to actual hardware implementation.
 <figure style="text-align: center;">
     <img src="images/schema.jpg" alt="Block diagram" width="600">
     <figcaption>Block diagram</figcaption>
 </figure>
+
 Choice of pins was carefully thought out to make best use of Arduino capabilities, using digital pins for boolean types of sensors and devices, pwm pins for fan control, I2C pins for the I2C bus and analog pins for analog sensors.
 
 ### 1. Mainboard
