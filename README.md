@@ -40,7 +40,7 @@ Future upgrades will include features like automatic irrigation based on soil mo
 
 
 ## Hardware description of demo application
-Every great project starts on the planning board. The following diagram shows peripherals connected to the Arduino nano, both already implemented as we created it prior to actual hardware implementation.
+Every great project starts on the planning board. The following diagram shows peripherals connected to the Arduino nano, both already implemented and planned for implementation
 <figure style="text-align: center;">
     <img src="images/schema.jpg" alt="Block diagram" width="600">
     <figcaption>Block diagram</figcaption>
