@@ -81,7 +81,7 @@ We used mini-ATX PC supply for our project. These supplies are easily obtained f
 5V network is used for low-power components whereas 12V network is used for fans, leds and water pump.
 
 ### 5. Display
-16x2 LCD backlit display is used to show statistic and enable basic settings change. This display was chosen for it good readability and simplicity of use. The display is equipped with I2C shield to save precisious GPIOs.
+16x2 LCD backlit display is used to show statistic and enable basic settings change. This display was chosen for its good readability and simplicity of use. The display is equipped with I2C shield to save precisious GPIOs.
 
 
 ## Software description
@@ -98,7 +98,7 @@ We used mini-ATX PC supply for our project. These supplies are easily obtained f
 - **Lighting Schedule**: We used a real-time clock (RTC) to adjust lighting schedules dynamically based on sunrise and sunset times.
 - **Automated Watering**: We automated soil irrigation based on moisture levels detected by sensors. The hardware side still waits for implementation but from software point of view, everything is ready.
 
-**Variables flowchart**: All modules have access to variables file that stores global variables like peripherals status and configuration settings. Settings are automatically sadef to EEPROM and loaded after startup to prevent loss in case of system reset.
+**Variables flowchart**: All modules have access to variables file that stores global variables like peripherals status and configuration settings. Settings are automatically saved to EEPROM and loaded after startup to prevent loss in case of system reset.
 
 <figure style="text-align: center;">
     <img src="images/DE_2_diagram.svg" alt="variables diagram" width="600">
@@ -135,13 +135,13 @@ See [main README](src/main.md) for more information about main file
 ### 2. User Interface and communication with PC
 
 #### LCD Display
-The "UI" consists of 5 screens of which 4 are informational and 5th is for changing settings. The system automatically loops trough the screens for convenient access to important information. Navigation is possible trough keys in serial port
+The "UI" consists of 5 screens of which 4 are informational and the 5th is for changing settings. The system automatically loops trough the screens for convenient access to important information. Navigation is possible trough keys in serial port
   - b : switching screens
   - d : down
   - u : up
   - r : right
   - l : left
-in future, display will have dedicated keyboard to alow control without PC connected.
+in future, display will have dedicated keyboard to allow control without PC connected.
 
 ##### Screens
   1. : displays temp. of air, humidity of air and humidity of soil, time
@@ -221,7 +221,7 @@ Allows users to adjust settings via a terminal interface.
 10. [Shotcut video editor](https://www.shotcut.org/)
 11. [ADC and LCD library by Marian Hrinko](https://github.com/Matiasus/HD44780_PCF8574)
 
-## Licesing terms
+## Licensing terms
 This project is licensed under the Apache License 2.0.
 You are free to use, modify, and distribute this software under the terms of the license.
 Key permissions include:
